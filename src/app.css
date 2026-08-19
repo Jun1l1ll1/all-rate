@@ -10,6 +10,8 @@
 
 html, body {
     color-scheme: dark;
+    padding: 0;
+    margin: 0;
 }
 
 * {
@@ -49,6 +51,14 @@ button {
     align-items: center;
     gap: var(--gap);
 }
+.flex-column {
+    --gap: 0px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--gap);
+}
 
 .center {
     display: flex;
@@ -56,13 +66,12 @@ button {
     justify-content: center;
 }
 
-.grid {
-    --min-cell-w: 200px;
-    --gap: 0px;
+.remove {
+    display: none;
+}
 
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--min-cell-w), 1fr));
-    gap: var(--gap);
+.main-content {
+    padding: 10px;
 }
 
 .back-btn {

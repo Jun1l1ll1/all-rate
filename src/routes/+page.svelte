@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { resolve } from '$app/paths';
     import NewButton from '$lib/components/NewButton.svelte';
 
     const favorites = [
@@ -41,32 +42,33 @@
     ]
 </script>
 
-
-{#if favorites}
-    <h2>Favorites</h2>
-
-    <div class="grid" style="--min-cell-w: 10rem; --gap: 10px">
-        {#each favorites as favCol}
+<div class="main-content">
+    {#if favorites}
+        <h2>Favorites</h2>
+    
+        <div class="col-grid" style="--min-cell-w: 10rem; --gap: 10px">
+            {#each favorites as favCol (favCol.cid)}
+                <div class="col-grid-item">
+                    <button class="collection" onclick={() => goto(resolve(`/collection?cid=${favCol.cid}`))}>
+                        <h3>{favCol.title}</h3>
+                    </button>
+                </div>
+            {/each}
+        </div>
+    
+        <hr />
+        <h2>All collections</h2>
+    {/if}
+    
+    <div class="col-grid" style="--min-cell-w: 10rem; --gap: 10px">
+        {#each collections as col (col.cid)}
             <div class="col-grid-item">
-                <button class="collection" onclick={() => goto('/collection?cid=' + favCol.cid)}>
-                    <h3>{favCol.title}</h3>
+                <button class="collection" onclick={() => goto(resolve(`/collection?cid=${col.cid}`))}>
+                    <h3>{col.title}</h3>
                 </button>
             </div>
         {/each}
     </div>
-
-    <hr />
-    <h2>All collections</h2>
-{/if}
-
-<div class="grid" style="--min-cell-w: 10rem; --gap: 10px">
-    {#each collections as col}
-        <div class="col-grid-item">
-            <button class="collection" onclick={() => goto('/collection?cid=' + col.cid)}>
-                <h3>{col.title}</h3>
-            </button>
-        </div>
-    {/each}
 </div>
 
 <NewButton type="collection" />
@@ -75,6 +77,15 @@
 <!-- <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p> -->
 
 <style>
+
+    .col-grid {
+        --min-cell-w: 200px;
+        --gap: 0px;
+
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(var(--min-cell-w), 1fr));
+        gap: var(--gap);
+    }
 
     .col-grid-item {
         display: flex;

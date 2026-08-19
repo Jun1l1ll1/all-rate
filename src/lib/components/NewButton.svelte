@@ -1,21 +1,16 @@
 <script lang="ts">
 
     import { goto } from '$app/navigation';
+    import { resolve } from '$app/paths';
 
-    let { type = null } = $props();
-    const validTypes = ['collection', 'item']
+    type ValidType = 'collection' | 'item';
+
+    let { type = 'item' }: { type: ValidType } = $props();
+
 </script>
 
 
-<button class="new-btn" onclick={() => {
-    if (validTypes.includes(type)) goto(`/create/${type}`);
-}}>
-    {#if validTypes.includes(type)}
-        +
-    {:else}
-        Invalid
-    {/if}
-</button>
+<button class="new-btn" onclick={() => goto(resolve(`/create/${type}`))}>+</button>
 
 
 <style>
@@ -26,6 +21,7 @@
         position: absolute;
         bottom: var(--offset);
         right: var(--offset);
+        z-index: 10;
 
         background-color: var(--g-primary-color);
         font-weight: bold;
