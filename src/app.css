@@ -1,0 +1,73 @@
+
+:root {
+    --g-border-radius: 8px;
+
+    --g-primary-color: #425866;
+
+    --g-highlight-color: #00f2ff;
+    --g-hover-opasity: .2;
+}
+
+html, body {
+    color-scheme: dark;
+}
+
+* {
+    font-family: Calibri, 'Trebuchet MS', sans-serif;
+}
+
+h1 {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    position: relative;
+    overflow: hidden;
+    border: none;
+    border-radius: var(--g-border-radius);
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-color: var(--g-highlight-color);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    &:hover::before, &:active::before {
+        opacity: var(--g-hover-opasity);
+    }
+}
+
+.flex-row {
+    --gap: 0px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap);
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid {
+    --min-cell-w: 200px;
+    --gap: 0px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--min-cell-w), 1fr));
+    gap: var(--gap);
+}
+
+.back-btn {
+    background-color: transparent;
+    min-width: 2.5rem;
+    font-weight: bold;
+    font-size: large;
+}
