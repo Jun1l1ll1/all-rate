@@ -35,7 +35,7 @@ export type Database = {
             items: {
                 Row: {
                     id: string;
-                    collection_id: string;
+                    cid: string;
                     title: string;
                     rating: number;
                     comment: string | null;
@@ -45,7 +45,7 @@ export type Database = {
                 };
                 Insert: {
                     id?: string;
-                    collection_id: string;
+                    cid: string;
                     title: string;
                     rating: number;
                     comment?: string | null;
@@ -55,7 +55,7 @@ export type Database = {
                 };
                 Update: {
                     id?: string;
-                    collection_id?: string;
+                    cid?: string;
                     title?: string;
                     rating?: number;
                     comment?: string | null;
@@ -65,9 +65,9 @@ export type Database = {
                 Relationships: [];
             };
             collection_favorites: {
-                Row: { user_id: string; collection_id: string; created_at: string };
-                Insert: { user_id?: string; collection_id: string; created_at?: string };
-                Update: { user_id?: string; collection_id?: string; created_at?: string };
+                Row: { user_id: string; cid: string; created_at: string };
+                Insert: { user_id?: string; cid: string; created_at?: string };
+                Update: { user_id?: string; cid?: string; created_at?: string };
                 Relationships: [];
             };
         };

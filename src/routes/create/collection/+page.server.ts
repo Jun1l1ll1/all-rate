@@ -15,7 +15,7 @@ export const actions: Actions = {
             return fail(400, { error: titleError ?? descriptionError ?? 'Invalid form.' });
         }
 
-        const { data, error } = await locals.supabase
+        const { error } = await locals.supabase
             .from('collections')
             .insert({
                 owner_id: user.id,
@@ -27,6 +27,6 @@ export const actions: Actions = {
             .single();
 
         if (error) return fail(400, { error: error.message });
-        redirect(303, `/collection?cid=${data.id}`);
+        redirect(303, '/');
     }
 };

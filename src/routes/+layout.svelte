@@ -12,11 +12,9 @@
     }
 
     let { children } = $props();
-
+    
     const title = $derived(
-        page.url.pathname === '/collection'
-            ? page.url.searchParams.get('cid') //TODO Get the name of the collection from the collection id
-            : null
+        page.url.pathname === '/collection' ? page.data.collection?.title ?? null : null
     );
 </script>
 

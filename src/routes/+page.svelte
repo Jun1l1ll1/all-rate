@@ -9,6 +9,7 @@
 <div class="main-content">
     {#if !data.user}
         <p><a href={resolve('/auth')}>Sign in to manage your collections.</a></p>
+        
     {:else}
         {#if data.favorites.length > 0}
             <h2>Favorites</h2>

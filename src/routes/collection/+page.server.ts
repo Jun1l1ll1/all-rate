@@ -13,9 +13,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
     const collection = await getVisibleCollection(locals.supabase, collectionId);
 
-    if (!collection) {
-        throw error(404, 'Collection not found.');
-    }
+    if (!collection) throw error(404, 'Collection not found.');
 
     return collection;
 };

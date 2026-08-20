@@ -7,20 +7,17 @@
 
     {#if data.signedIn}
         <p>You are already signed in.</p>
+
     {:else}
-        {#if data.sent}
+        <!-- {#if data.sent}
             <p>Check your email for a sign-in link.</p>
-        {/if}
+        {/if} -->
         {#if form?.error}
             <p class="form-error">{form.error}</p>
         {/if}
 
         <form method="POST">
-            <label>
-                Email
-                <input name="email" type="email" autocomplete="email" required />
-            </label>
-            <button type="submit">Send sign-in link</button>
+            <button type="submit">Sign in with Google</button>
         </form>
     {/if}
 </main>
@@ -30,15 +27,13 @@
         padding: 1rem;
         max-width: 30rem;
     }
-    form,
-    label {
+
+    form {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-    }
-    form {
         gap: 1rem;
     }
+    
     .form-error {
         color: #ff8f8f;
     }

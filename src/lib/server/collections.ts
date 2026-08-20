@@ -13,13 +13,13 @@ export async function listUserCollections(supabase: CollectionsClient, user: Use
             .select('id, title, description, is_public, created_at, updated_at')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: false }),
-        supabase.from('collection_favorites').select('collection_id').eq('user_id', user.id)
+        supabase.from('collection_favorites').select('cid').eq('user_id', user.id)
     ]);
 
     if (collectionsError) throw collectionsError;
     if (favoritesError) throw favoritesError;
 
-    const favoriteIds = new Set((favorites ?? []).map((favorite) => favorite.collection_id));
+    const favoriteIds = new Set((favorites ?? []).map((favorite) => favorite.cid));
 
     return {
         collections: collections ?? [],
@@ -39,8 +39,8 @@ export async function getVisibleCollection(supabase: CollectionsClient, collecti
 
     const { data: items, error: itemsError } = await supabase
         .from('items')
-        .select('id, collection_id, title, rating, comment, position, created_at, updated_at')
-        .eq('collection_id', collectionId)
+        .select('id, cid, title, rating, comment, position, created_at, updated_at')
+        .eq('cid', collectionId)
         .order('position', { ascending: true })
         .order('created_at', { ascending: true });
 

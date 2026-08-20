@@ -8,8 +8,6 @@
 
 The application uses Supabase Auth cookies in SvelteKit server hooks. The publishable key is safe for browser use because database access is protected by Row Level Security. Never expose a Supabase service-role key to the browser.
 
-For passwordless email sign-in, set the Supabase Auth email template URL to `/auth/confirm?token_hash={{ .TokenHash }}&type=email` and add your local and production URLs under Auth URL Configuration.
-
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
 ## Creating a project

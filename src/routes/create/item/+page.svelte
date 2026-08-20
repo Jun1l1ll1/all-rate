@@ -13,7 +13,7 @@
     {/if}
 
     <form method="POST">
-        <input type="hidden" name="collection_id" value={collectionId} />
+        <input type="hidden" name="cid" value={collectionId} />
 
         <label>
             Title
