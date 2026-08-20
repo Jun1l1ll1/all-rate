@@ -1,17 +1,23 @@
 <script lang="ts">
-
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
 
     type ValidType = 'collection' | 'item';
 
-    let { type = 'item' }: { type: ValidType } = $props();
+    let { type = 'item', collectionId }: { type: ValidType; collectionId?: string } = $props();
 
+    const destination = $derived(
+        type === 'item' && collectionId
+            ? `/create/item?cid=${encodeURIComponent(collectionId)}`
+            : `/create/${type}`
+    );
 </script>
 
-
-<button class="new-btn" onclick={() => goto(resolve(`/create/${type}`))}>+</button>
-
+<button
+    class="new-btn"
+    onclick={() => goto(resolve(destination as `/create/item?${string}` | '/create/collection'))}
+    >+</button
+>
 
 <style>
     .new-btn {

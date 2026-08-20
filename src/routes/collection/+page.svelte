@@ -1,10 +1,8 @@
 <script lang="ts">
-    import { page } from '$app/state';
-	import { longpress } from '$lib/scripts/actions';
+    import { longpress } from '$lib/scripts/actions';
     import NewButton from '$lib/components/NewButton.svelte';
 
-
-    const cid = $derived(page.url.searchParams.get('cid'));
+    let { data } = $props();
 
     let editMode = $state(false);
 
@@ -33,105 +31,62 @@
         toggleListItem(node, true);
         toggleEditMode(true);
     }
-
-    const items = [
-        {
-            iid: 'C1',
-            title: 'Title 1',
-            rating: 5,
-            comment: 'Comment 1'
-        },
-        {
-            iid: 'C2',
-            title: 'Title 2',
-            rating: 5,
-            comment: ''
-        },
-        {
-            iid: 'C3',
-            title: 'Title 3',
-            rating: 5,
-            comment: 'Comment 1'
-        },
-        {
-            iid: 'C4',
-            title: 'Title 4',
-            rating: 5,
-            comment: 'Comment 1'
-        },
-        {
-            iid: 'C5',
-            title: 'Title 5',
-            rating: 5.7,
-            comment: 'Comment 1'
-        },
-        {
-            iid: 'C6',
-            title: 'Title 6',
-            rating: 5,
-            comment: 'Comment 1'
-        },
-        {
-            iid: 'C7',
-            title: 'Title 7',
-            rating: 5,
-            comment: 'Comment 1'
-        }
-    ]
 </script>
 
-
-{#if cid}
-
-    <div class="flex-row top-menu">
-        <div>
-            <!-- Left elements -->
-        </div>
-        <div>
-            <!-- Right elements -->
-            <input type="checkbox" name="edit-chbx" id="edit-chbx" onchange={(e) => {
-                if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
-            }} />
-        </div>
+<div class="flex-row top-menu">
+    <div>
+        <span>{data.collection.is_public ? 'Public' : 'Private'}</span>
     </div>
+    <div>
+        <input
+            type="checkbox"
+            name="edit-chbx"
+            id="edit-chbx"
+            onchange={(e) => {
+                if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
+            }}
+        />
+    </div>
+</div>
 
-    <div class="main-content">
+<div class="main-content">
+    {#if data.items.length === 0}
+        <p>No items yet.</p>
+    {:else}
         <div class="list-grid">
-            {#each items as item (item.iid)}
-                <button class="list-row"
-                    onclick={(e) => { if (editMode && e.target instanceof HTMLElement) toggleListItem(e.target); }}
+            {#each data.items as item (item.id)}
+                <button
+                    class="list-row"
+                    onclick={(e) => {
+                        if (editMode && e.target instanceof HTMLElement) toggleListItem(e.target);
+                    }}
                     use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}
                 >
                     <div class="list-selecting">
-                        <input type="checkbox" class="list-checkbox {editMode ? '': ' remove'}" />
+                        <input type="checkbox" class="list-checkbox {editMode ? '' : ' remove'}" />
                     </div>
 
                     <div class="list-item">
                         <div class="list-rating">
                             <h3>{item.rating}</h3>
                         </div>
-                        
+
                         <div class="flex-column list-item-right">
                             <h2 class="list-title">{item.title}</h2>
                             {#if item.comment}
-                            <span class="list-comment">{item.comment}</span>
+                                <span class="list-comment">{item.comment}</span>
                             {/if}
                         </div>
                     </div>
                 </button>
             {/each}
         </div>
-    </div>
+    {/if}
+</div>
 
-    <NewButton type="item" />
-
-{:else}
-    <p>Invalid collection, go back and select a collection.</p>
-{/if}
-
+<NewButton type="item" collectionId={data.collection.id} />
 
 <style>
-
     .top-menu {
         justify-content: space-between;
         box-shadow: 0 10px 10px #00000033;
@@ -151,7 +106,8 @@
         grid-template-columns: subgrid;
         background-color: transparent;
 
-        &:hover::before, &:active::before {
+        &:hover::before,
+        &:active::before {
             opacity: 0; /* No hover effect */
         }
     }
@@ -198,5 +154,4 @@
             font-size: 0.8rem;
         }
     }
-
 </style>

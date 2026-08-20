@@ -1,14 +1,14 @@
-
 :root {
     --g-border-radius: 8px;
 
     --g-primary-color: #425866;
 
     --g-highlight-color: #00f2ff;
-    --g-hover-opasity: .2;
+    --g-hover-opasity: 0.2;
 }
 
-html, body {
+html,
+body {
     color-scheme: dark;
     padding: 0;
     margin: 0;
@@ -31,14 +31,15 @@ button {
     border-radius: var(--g-border-radius);
 
     &::before {
-        content: "";
+        content: '';
         position: absolute;
         inset: 0;
         background-color: var(--g-highlight-color);
         opacity: 0;
         transition: opacity 0.2s ease;
     }
-    &:hover::before, &:active::before {
+    &:hover::before,
+    &:active::before {
         opacity: var(--g-hover-opasity);
     }
 }
