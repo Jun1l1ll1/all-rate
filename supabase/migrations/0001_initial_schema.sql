@@ -10,7 +10,7 @@ create table public.collections (
 
 create table public.items (
     id uuid primary key default gen_random_uuid(),
-    collection_id uuid not null references public.collections(id) on delete cascade,
+    cid uuid not null references public.collections(id) on delete cascade,
     title text not null check (char_length(trim(title)) between 1 and 200),
     rating numeric(3, 1) not null check (rating between 0 and 10),
     comment text check (comment is null or char_length(comment) <= 5000),
@@ -21,14 +21,14 @@ create table public.items (
 
 create table public.collection_favorites (
     user_id uuid not null references auth.users(id) on delete cascade,
-    collection_id uuid not null references public.collections(id) on delete cascade,
+    cid uuid not null references public.collections(id) on delete cascade,
     created_at timestamptz not null default timezone('utc', now()),
-    primary key (user_id, collection_id)
+    primary key (user_id, cid)
 );
 
 create index collections_owner_id_idx on public.collections(owner_id);
 create index collections_public_idx on public.collections(is_public) where is_public = true;
-create index items_collection_position_idx on public.items(collection_id, position, created_at);
+create index items_collection_position_idx on public.items(cid, position, created_at);
 create index collection_favorites_user_id_idx on public.collection_favorites(user_id);
 
 alter table public.collections enable row level security;
@@ -57,7 +57,7 @@ on public.items for select
 using (
     exists (
         select 1 from public.collections
-        where collections.id = items.collection_id
+        where collections.id = items.cid
         and (collections.owner_id = (select auth.uid()) or collections.is_public = true)
     )
 );
@@ -67,7 +67,7 @@ on public.items for insert
 with check (
     exists (
         select 1 from public.collections
-        where collections.id = items.collection_id
+        where collections.id = items.cid
         and collections.owner_id = (select auth.uid())
     )
 );
@@ -77,14 +77,14 @@ on public.items for update
 using (
     exists (
         select 1 from public.collections
-        where collections.id = items.collection_id
+        where collections.id = items.cid
         and collections.owner_id = (select auth.uid())
     )
 )
 with check (
     exists (
         select 1 from public.collections
-        where collections.id = items.collection_id
+        where collections.id = items.cid
         and collections.owner_id = (select auth.uid())
     )
 );
@@ -94,7 +94,7 @@ on public.items for delete
 using (
     exists (
         select 1 from public.collections
-        where collections.id = items.collection_id
+        where collections.id = items.cid
         and collections.owner_id = (select auth.uid())
     )
 );
@@ -109,7 +109,7 @@ with check (
     user_id = (select auth.uid())
     and exists (
         select 1 from public.collections
-        where collections.id = collection_favorites.collection_id
+        where collections.id = collection_favorites.cid
         and (collections.owner_id = (select auth.uid()) or collections.is_public = true)
     )
 );

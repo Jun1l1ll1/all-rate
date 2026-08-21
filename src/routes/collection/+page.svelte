@@ -30,46 +30,51 @@
     {/if}
 </div>
 
-<div class="flex-row top-menu">
-    <div>
-    
-    </div>
-    <div>
-        <input
-            type="checkbox"
-            name="edit-chbx"
-            id="edit-chbx"
-            onchange={(e) => {
-                if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
-            }}
-        />
-    </div>
-</div>
-
-<div class="main-content">
-    {#if data.items.length === 0}
-        <p>Create a rating with the + button.</p>
-
-    {:else}
-        <div class="list-grid">
-            {#each data.items.sort((a, b) => b.rating - a.rating) as item (item.id)}
-                <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}>
-                    <input type="checkbox" class="edit-checkbox remove" />
-                    <div class="list-rating">
-                        <h3>{item.rating}</h3>
-                    </div>
-
-                    <div class="flex-column list-item-right">
-                        <h2 class="list-title">{item.title}</h2>
-                        {#if item.comment}
-                            <span class="list-comment">{item.comment}</span>
-                        {/if}
-                    </div>
-                </label>
-            {/each}
+<form method="POST">
+    <div class="flex-row top-menu">
+        <div>
+        
         </div>
-    {/if}
-</div>
+        <div>
+            <button type="submit" formaction="?/deleteItems&cid={data.collection.id}" disabled={!editMode}>
+                Delete
+            </button>
+            <input
+                type="checkbox"
+                name="edit-chbx"
+                id="edit-chbx"
+                onchange={(e) => {
+                    if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
+                }}
+            />
+        </div>
+    </div>
+
+    <div class="main-content">
+        {#if data.items.length === 0}
+            <p>Create a rating with the + button.</p>
+
+        {:else}
+            <div class="list-grid">
+                {#each data.items.sort((a, b) => b.rating - a.rating) as item (item.id)}
+                    <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}>
+                        <input type="checkbox" name="iid" value={item.id} class="edit-checkbox remove" />
+                        <div class="list-rating">
+                            <h3>{item.rating}</h3>
+                        </div>
+
+                        <div class="flex-column list-item-right">
+                            <h2 class="list-title">{item.title}</h2>
+                            {#if item.comment}
+                                <span class="list-comment">{item.comment}</span>
+                            {/if}
+                        </div>
+                    </label>
+                {/each}
+            </div>
+        {/if}
+    </div>
+</form>
 
 <NewButton type="item" collectionId={data.collection.id} />
 
