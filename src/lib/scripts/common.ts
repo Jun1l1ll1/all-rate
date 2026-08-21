@@ -1,3 +1,4 @@
+
 type LongpressOptions = {
     threshold?: number;
     callback: (node: HTMLElement) => void;
@@ -45,4 +46,21 @@ export function longpress(node: HTMLElement, options: LongpressOptions) {
             node.removeEventListener('click', handleClick, true);
         }
     };
+}
+
+
+
+
+export function uncheckAllEditCheckboxes() {
+    document.querySelectorAll('.edit-checkbox').forEach((checkbox) => {
+        if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
+    });
+}
+
+export function toggleEditItem(node: HTMLElement, checked?: boolean) {
+    const checkbox = node.querySelector('.edit-checkbox') as HTMLInputElement | null;
+    if (checkbox) {
+        if (checked !== undefined) checkbox.checked = checked;
+        else checkbox.checked = !checkbox.checked;
+    }
 }

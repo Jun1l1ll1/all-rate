@@ -1,37 +1,25 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
-    import { longpress } from '$lib/scripts/actions';
+    import { longpress, uncheckAllEditCheckboxes, toggleEditItem } from '$lib/scripts/common';
+
     import NewButton from '$lib/components/NewButton.svelte';
 
     let { data } = $props();
     
     let editMode = $state(false);
 
-    function toggleEditMode(newEditMode?: boolean) {
-        if (newEditMode === undefined) editMode = !editMode;
-        else editMode = newEditMode;
-
-        if (!editMode) {
-            // Uncheck all checkboxes when exiting edit mode
-            document.querySelectorAll('.collection-checkbox').forEach((checkbox) => {
-                if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
-            });
-        }
-    }
-
-    function toggleCollection(node: HTMLElement, checked?: boolean) {
-        const listCheckbox = node.querySelector('.collection-checkbox') as HTMLInputElement | null;
-        if (listCheckbox) {
-            if (checked !== undefined) listCheckbox.checked = checked;
-            else listCheckbox.checked = !listCheckbox.checked;
-        }
+    function toggleEditMode(enabled?: boolean) {
+        if (enabled === undefined) editMode = !editMode;
+        else editMode = enabled;
+        
+        if (!editMode) uncheckAllEditCheckboxes();
     }
 
     function longselectCollection(node: HTMLElement) {
         const editChbx = document.getElementById('edit-chbx') as HTMLInputElement | null;
         if (editChbx) editChbx.checked = true;
-        toggleCollection(node, true);
+        toggleEditItem(node, true);
         toggleEditMode(true);
     }
 
@@ -66,7 +54,7 @@
                 {#each data.favorites as favCol (favCol.id)}
                     <div class="col-grid-item">
                         <label class="collection {editMode ? 'outline' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}>
-                            <input type="checkbox" class="collection-checkbox remove" />
+                            <input type="checkbox" class="edit-checkbox remove" />
                             <button onclick={() => !editMode ? goto(resolve(`/collection?cid=${favCol.id}`)) : undefined}>
                                 <h3>{favCol.title}</h3>
                             </button>
@@ -78,7 +66,7 @@
 
         <h2>All collections</h2>
         {#if data.collections.length === 0}
-            <p>No collections yet.</p>
+            <p>Create a collection with the + button.</p>
         {/if}
 
         <div class="col-grid" style="--min-cell-w: 10rem; --gap: 10px">
@@ -86,9 +74,9 @@
                 <div class="col-grid-item">
                     <button class="collection {editMode ? 'outline' : ''}"
                         use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
-                        onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : toggleCollection(event.currentTarget as HTMLElement)}
+                        onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : toggleEditItem(event.currentTarget as HTMLElement)}
                     >
-                        <input type="checkbox" class="collection-checkbox remove"/>
+                        <input type="checkbox" class="edit-checkbox remove"/>
                         <h3>{col.title}</h3>
                     </button>
                 </div>
@@ -124,8 +112,8 @@
         max-width: 100%;
         aspect-ratio: 3/2;
 
-        &:has(> .collection-checkbox:checked) {
-            outline: 2px solid var(--g-highlight-color);
+        &:has(> .edit-checkbox:checked) {
+            outline: var(--g-outline-size) solid var(--g-highlight-color);
         }
     }
 </style>

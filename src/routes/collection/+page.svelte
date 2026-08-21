@@ -1,47 +1,38 @@
 <script lang="ts">
-    import { longpress } from '$lib/scripts/actions';
+    import { longpress, uncheckAllEditCheckboxes, toggleEditItem } from '$lib/scripts/common';
     import NewButton from '$lib/components/NewButton.svelte';
 
     let { data } = $props();
 
     let editMode = $state(false);
-
-    function toggleEditMode(newEditMode?: boolean) {
-        if (newEditMode === undefined) editMode = !editMode;
-        else editMode = newEditMode;
-
-        if (!editMode) {
-            // Uncheck all checkboxes when exiting edit mode
-            document.querySelectorAll('.list-checkbox').forEach((checkbox) => {
-                if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
-            });
-        }
+    
+    function toggleEditMode(enabled?: boolean) {
+        if (enabled === undefined) editMode = !editMode;
+        else editMode = enabled;
+        
+        if (!editMode) uncheckAllEditCheckboxes();
     }
-
-    function toggleListItem(node: HTMLElement, checked?: boolean) {
-        const listCheckbox = node.querySelector('.list-checkbox') as HTMLInputElement | null;
-        if (listCheckbox) {
-            if (checked !== undefined) listCheckbox.checked = checked;
-            else listCheckbox.checked = !listCheckbox.checked;
-        }
-    }
-
+    
     function longselectListItem(node: HTMLElement) {
         const editChbx = document.getElementById('edit-chbx') as HTMLInputElement | null;
         if (editChbx) editChbx.checked = true;
-        toggleListItem(node, true);
+        toggleEditItem(node, true);
         toggleEditMode(true);
     }
+
 </script>
 
 <div class="flex-row" style="--gap: 10px">
     <button onclick={() => {window.location.href = '/'}} class="back-btn">&larr;</button>
     <h1>{data.collection.title}</h1>
+    {#if !data.collection.is_public}
+        <span>(Private)</span>
+    {/if}
 </div>
 
 <div class="flex-row top-menu">
     <div>
-        <span>{data.collection.is_public ? 'Public' : 'Private'}</span>
+    
     </div>
     <div>
         <input
@@ -57,12 +48,13 @@
 
 <div class="main-content">
     {#if data.items.length === 0}
-        <p>No items yet.</p>
+        <p>Create a rating with the + button.</p>
+
     {:else}
         <div class="list-grid">
-            {#each data.items as item (item.id)}
+            {#each data.items.sort((a, b) => b.rating - a.rating) as item (item.id)}
                 <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}>
-                    <input type="checkbox" class="list-checkbox remove" />
+                    <input type="checkbox" class="edit-checkbox remove" />
                     <div class="list-rating">
                         <h3>{item.rating}</h3>
                     </div>
@@ -98,8 +90,8 @@
         gap: 10px;
         border-radius: var(--g-border-radius);
 
-        &:has(> .list-checkbox:checked) {
-            outline: 2px solid var(--g-highlight-color);
+        &:has(> .edit-checkbox:checked) {
+            outline: var(--g-outline-size) solid var(--g-highlight-color);
         }
     }
 
