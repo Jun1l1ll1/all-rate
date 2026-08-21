@@ -21,7 +21,7 @@ export const actions: Actions = {
                 owner_id: user.id,
                 title: formText(formData.get('title')),
                 description: formText(formData.get('description')) || null,
-                is_public: formData.get('is_public') === 'on'
+                is_public: formData.get('is_private') !== 'on'
             })
             .select('id')
             .single();

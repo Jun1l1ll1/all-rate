@@ -6,10 +6,11 @@
 
     let editMode = $state(false);
 
-    function toggleEditMode(newEditMode: boolean) {
-        editMode = newEditMode;
+    function toggleEditMode(newEditMode?: boolean) {
+        if (newEditMode === undefined) editMode = !editMode;
+        else editMode = newEditMode;
 
-        if (!newEditMode) {
+        if (!editMode) {
             // Uncheck all checkboxes when exiting edit mode
             document.querySelectorAll('.list-checkbox').forEach((checkbox) => {
                 if (checkbox instanceof HTMLInputElement) checkbox.checked = false;
@@ -33,6 +34,11 @@
     }
 </script>
 
+<div class="flex-row" style="--gap: 10px">
+    <button onclick={() => {window.location.href = '/'}} class="back-btn">&larr;</button>
+    <h1>{data.collection.title}</h1>
+</div>
+
 <div class="flex-row top-menu">
     <div>
         <span>{data.collection.is_public ? 'Public' : 'Private'}</span>
@@ -55,30 +61,19 @@
     {:else}
         <div class="list-grid">
             {#each data.items as item (item.id)}
-                <button
-                    class="list-row"
-                    onclick={(e) => {
-                        if (editMode && e.target instanceof HTMLElement) toggleListItem(e.target);
-                    }}
-                    use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}
-                >
-                    <div class="list-selecting">
-                        <input type="checkbox" class="list-checkbox {editMode ? '' : ' remove'}" />
+                <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}>
+                    <input type="checkbox" class="list-checkbox remove" />
+                    <div class="list-rating">
+                        <h3>{item.rating}</h3>
                     </div>
 
-                    <div class="list-item">
-                        <div class="list-rating">
-                            <h3>{item.rating}</h3>
-                        </div>
-
-                        <div class="flex-column list-item-right">
-                            <h2 class="list-title">{item.title}</h2>
-                            {#if item.comment}
-                                <span class="list-comment">{item.comment}</span>
-                            {/if}
-                        </div>
+                    <div class="flex-column list-item-right">
+                        <h2 class="list-title">{item.title}</h2>
+                        {#if item.comment}
+                            <span class="list-comment">{item.comment}</span>
+                        {/if}
                     </div>
-                </button>
+                </label>
             {/each}
         </div>
     {/if}
@@ -87,48 +82,24 @@
 <NewButton type="item" collectionId={data.collection.id} />
 
 <style>
-    .top-menu {
-        justify-content: space-between;
-        box-shadow: 0 10px 10px #00000033;
-        padding: 5px;
-        margin-bottom: 5px;
-    }
-
     .list-grid {
         display: grid;
-        grid-template-columns: min-content min-content 1fr;
+        grid-template-columns: min-content 1fr;
         row-gap: 10px;
-    }
-
-    .list-row {
-        display: grid;
-        grid-column: 1 / -1;
-        grid-template-columns: subgrid;
-        background-color: transparent;
-
-        &:hover::before,
-        &:active::before {
-            opacity: 0; /* No hover effect */
-        }
     }
 
     .list-item {
         display: grid;
-        grid-column: 2 / -1;
+        grid-column: 1 / -1;
         grid-template-columns: subgrid;
         background-color: #333333;
         text-align: left;
         padding: 5px 10px;
         gap: 10px;
         border-radius: var(--g-border-radius);
-    }
 
-    .list-selecting {
-        display: flex;
-        justify-content: center;
-
-        > input {
-            margin-right: 10px;
+        &:has(> .list-checkbox:checked) {
+            outline: 2px solid var(--g-highlight-color);
         }
     }
 

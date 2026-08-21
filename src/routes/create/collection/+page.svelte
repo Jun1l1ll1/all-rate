@@ -21,8 +21,8 @@
         </label>
 
         <label class="checkbox-label">
-            <input type="checkbox" name="is_public" />
-            Public read-only collection
+            <input type="checkbox" name="is_private" />
+            Private (only visible to you)
         </label>
 
         <button type="submit">Create collection</button>
