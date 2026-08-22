@@ -7,17 +7,26 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 };
 
 export const actions: Actions = {
-    default: async ({ locals, url }) => {
+    signIn: async ({ locals, url }) => {
 
         const { data, error } = await locals.supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${url.origin}/auth/confirm`
+                redirectTo: `${url.origin}/account/confirm`
             }
         });
 
         if (error) return fail(400, { error: error.message });
         
         if (data.url) redirect(303, data.url);
+    },
+
+    signOut: async ({ locals }) => {
+
+        const { error } = await locals.supabase.auth.signOut()
+
+        if (error) return fail(400, { error: error.message });
+        
+        redirect(303, '/account');
     }
 };

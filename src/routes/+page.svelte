@@ -6,6 +6,7 @@
     import DiscreteErrorMessage from '$lib/components/DiscreteErrorMessage.svelte';
     import ConfirmPopup from '$lib/components/ConfirmPopup.svelte';
     import NewButton from '$lib/components/NewButton.svelte';
+    import SideMenu from '$lib/components/SideMenu.svelte';
 
     let { data, form } = $props();
     
@@ -34,7 +35,10 @@
 
 
 {#if !data.user}
-    <p><a href={resolve('/auth')}>Sign in to manage your collections.</a></p>
+    <div class="main-content">
+        <p>You are not logged in.</p>
+        <a href={resolve('/account')} class="btn" style="background-color: var(--g-primary-color);">Go to manage account</a>
+    </div>
 
 {:else}
 <form method="POST">
@@ -45,7 +49,9 @@
 
     <div class="flex-row top-menu">
         <div>
-        
+            <SideMenu>
+                <a href={resolve('/account')} class="btn">Manage account</a>
+            </SideMenu>
         </div>
         <div>
             <button 

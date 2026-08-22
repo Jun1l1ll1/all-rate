@@ -2,7 +2,10 @@
     --g-border-radius: 8px;
 
     --g-primary-color: #425866;
-    --g-error-color: #ff4040;
+    --g-error-color: #4d40ff;
+
+    --g-background-color: #181818;
+    --g-text-color: #ffffff;
 
     --g-highlight-color: #00f2ff;
     --g-hover-opasity: 0.2;
@@ -34,6 +37,8 @@ button, .btn {
     border-radius: var(--border-radius);
     padding-block: 1px;
     padding-inline: 6px;
+    color: var(--g-text-color);
+    text-decoration: none;
 
     &::before {
         content: '';
