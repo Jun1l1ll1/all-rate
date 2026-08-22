@@ -53,13 +53,16 @@
                 type="button"
                 onclick={() => { openConfirmPopup('delete-popup') }}
                 class="{!editMode ? 'remove' : ''}">Delete</button>
-            <input
-                type="checkbox"
-                name="edit-chbx"
-                id="edit-chbx"
-                onchange={(e) => {
-                    if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
-                }} />
+            <label for="edit-chbx" class="btn">
+                {#if editMode} Exit edit mode {:else} Edit {/if}
+                <input id="edit-chbx"
+                    type="checkbox"
+                    name="edit-chbx"
+                    class="remove"
+                    onchange={(e) => {
+                        if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
+                    }} />
+            </label>
         </div>
     </div>
 
