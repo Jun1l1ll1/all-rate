@@ -1,8 +1,11 @@
 <script lang="ts">
     import { longpress, uncheckAllEditCheckboxes, toggleEditItem } from '$lib/scripts/common';
+    
+    import DiscreteErrorMessage from '$lib/components/DiscreteErrorMessage.svelte';
+    import ConfirmPopup from '$lib/components/ConfirmPopup.svelte';
     import NewButton from '$lib/components/NewButton.svelte';
 
-    let { data } = $props();
+    let { data, form } = $props();
 
     let editMode = $state(false);
     
@@ -20,6 +23,11 @@
         toggleEditMode(true);
     }
 
+    function openConfirmPopup(popupId: string) {
+        const popup = document.getElementById(popupId) as HTMLDialogElement | null;
+        if (popup) popup.showModal();
+    }
+
 </script>
 
 <div class="flex-row" style="--gap: 10px">
@@ -31,22 +39,27 @@
 </div>
 
 <form method="POST">
+    <ConfirmPopup id="delete-popup"
+        msg="Are you sure you want to delete the selected items?"
+        submitBtnText="Delete"
+        formAction="?/deleteItems&cid={data.collection.id}" />
+
     <div class="flex-row top-menu">
         <div>
         
         </div>
         <div>
-            <button type="submit" formaction="?/deleteItems&cid={data.collection.id}" disabled={!editMode}>
-                Delete
-            </button>
+            <button 
+                type="button"
+                onclick={() => { openConfirmPopup('delete-popup') }}
+                class="{!editMode ? 'remove' : ''}">Delete</button>
             <input
                 type="checkbox"
                 name="edit-chbx"
                 id="edit-chbx"
                 onchange={(e) => {
                     if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
-                }}
-            />
+                }} />
         </div>
     </div>
 
@@ -58,7 +71,7 @@
             <div class="list-grid">
                 {#each data.items.sort((a, b) => b.rating - a.rating) as item (item.id)}
                     <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}>
-                        <input type="checkbox" name="iid" value={item.id} class="edit-checkbox remove" />
+                        <input disabled={!editMode} type="checkbox" name="iid" value={item.id} class="edit-checkbox remove" />
                         <div class="list-rating">
                             <h3>{item.rating}</h3>
                         </div>
@@ -77,6 +90,9 @@
 </form>
 
 <NewButton type="item" collectionId={data.collection.id} />
+{#if form?.error}
+    <DiscreteErrorMessage errorMessage={form.error} />
+{/if}
 
 <style>
     .list-grid {

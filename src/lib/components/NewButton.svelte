@@ -15,6 +15,7 @@
 
 <button
     class="new-btn"
+    type="button"
     onclick={() => goto(resolve(destination as `/create/item?${string}` | '/create/collection'))}
     >+</button
 >
