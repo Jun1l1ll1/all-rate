@@ -28,12 +28,20 @@
         if (popup) popup.showModal();
     }
 
+    function copyText(e: Event, text: string) {
+        navigator.clipboard.writeText(text);
+        let copyBtn = e.target as HTMLDialogElement | null;
+        if (copyBtn) copyBtn.innerText = 'URL copied!';
+    }
+
 </script>
 
 <div class="flex-row" style="--gap: 10px">
     <button onclick={() => {window.location.href = '/'}} class="back-btn">&larr;</button>
     <h1>{data.collection.title}</h1>
-    {#if !data.collection.is_public}
+    {#if data.collection.is_public}
+        <button onclick={(e) => {copyText(e, window.location.href)}}>Share</button>
+    {:else}
         <span>(Private)</span>
     {/if}
 </div>
