@@ -13,6 +13,7 @@ export type Database = {
                     created_at: string;
                     updated_at: string;
                     collection_color: string;
+                    pid: string | null;
                 };
                 Insert: {
                     id?: string;
@@ -23,6 +24,7 @@ export type Database = {
                     created_at?: string;
                     updated_at?: string;
                     collection_color?: string;
+                    pid?: string | null;
                 };
                 Update: {
                     id?: string;
@@ -32,6 +34,7 @@ export type Database = {
                     is_public?: boolean;
                     updated_at?: string;
                     collection_color?: string;
+                    pid?: string | null;
                 };
                 Relationships: [];
             };
@@ -63,6 +66,27 @@ export type Database = {
                     rating?: number;
                     comment?: string | null;
                     position?: number;
+                    updated_at?: string;
+                };
+                Relationships: [];
+            };
+            presets: {
+                Row: {
+                    id: string;
+                    name: string;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    name?: string;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    name?: string;
+                    created_at?: string;
                     updated_at?: string;
                 };
                 Relationships: [];

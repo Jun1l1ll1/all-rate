@@ -23,14 +23,17 @@
         </label>
 
         <label>
-            Preset (not implemented)
-            <select name="preset" disabled>
+            Preset (not functional)
+            <select name="preset">
                 <option value="">- None -</option>
+                {#each data.presets as preset (preset.id)}
+                    <option value={preset.id} selected={data.collection?.pid === preset.id}>{preset.name}</option>
+                {/each}
             </select>
         </label>
 
         <label class="checkbox-label">
-            <input type="checkbox" name="is_private" checked={!data.collection?.is_public} />
+            <input type="checkbox" name="is_private" checked={data.collection ? !data.collection.is_public : false} />
             Private (only visible to you)
         </label>
 

@@ -1,5 +1,6 @@
 import { fail, error, redirect } from '@sveltejs/kit';
 import { getCollection } from '$lib/server/collections';
+import { listAllPresets } from '$lib/server/presets';
 import { requiredText, optionalText, formText } from '$lib/server/validation';
 import type { PageServerLoad, Actions } from './$types';
 import { uuidPattern } from '$lib/scripts/variables';
@@ -15,7 +16,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     const collection = collectionId ? await getCollection(locals.supabase, collectionId) : null;
     if (collectionId && !collection) throw error(404, 'Collection not found.');
 
-    return { collection: collection };
+    const presets = await listAllPresets(locals.supabase);
+
+    return { collection: collection, presets: presets };
 };
 
 export const actions: Actions = {
@@ -28,6 +31,7 @@ export const actions: Actions = {
 		const updateCollectionId = formText(formData.get('cid')) || url.searchParams.get('cid') || '';
         const titleError = requiredText(formData.get('title'), 'Title', 120);
         const descriptionError = optionalText(formData.get('description'), 2000);
+		const presetId = formText(formData.get('preset'));
 
         if (titleError || descriptionError) {
             return fail(400, { error: titleError ?? descriptionError ?? 'Invalid form.' });
@@ -40,7 +44,8 @@ export const actions: Actions = {
                     title: formText(formData.get('title')),
                     description: formText(formData.get('description')) || null,
                     is_public: formData.get('is_private') !== 'on',
-                    collection_color: formText(formData.get('color'))
+                    collection_color: formText(formData.get('color')),
+                    pid: uuidPattern.test(presetId) ? presetId : null
                 })
                 .eq('id', updateCollectionId)
                 .single();
@@ -54,7 +59,8 @@ export const actions: Actions = {
                     title: formText(formData.get('title')),
                     description: formText(formData.get('description')) || null,
                     is_public: formData.get('is_private') !== 'on',
-                    collection_color: formText(formData.get('color'))
+                    collection_color: formText(formData.get('color')),
+                    pid: !uuidPattern.test(presetId) ? presetId : null
                 })
                 .select('id')
                 .single();

@@ -10,7 +10,7 @@ export async function listUserCollections(supabase: CollectionsClient, user: Use
     ] = await Promise.all([
         supabase
             .from('collections')
-            .select('id, title, description, is_public, created_at, updated_at, collection_color')
+            .select('id, title, description, is_public, created_at, updated_at, collection_color, pid')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: false }),
         supabase.from('collection_favorites').select('cid').eq('user_id', user.id)
@@ -30,7 +30,7 @@ export async function listUserCollections(supabase: CollectionsClient, user: Use
 export async function getCollectionAndItems(supabase: CollectionsClient, collectionId: string) {
     const { data: collection, error: collectionError } = await supabase
         .from('collections')
-        .select('id, owner_id, title, description, is_public, created_at, updated_at, collection_color')
+        .select('id, owner_id, title, description, is_public, created_at, updated_at, collection_color, pid')
         .eq('id', collectionId)
         .maybeSingle();
 
@@ -52,7 +52,7 @@ export async function getCollectionAndItems(supabase: CollectionsClient, collect
 export async function getCollection(supabase: CollectionsClient, collectionId: string) {
     const { data: collection, error: collectionError } = await supabase
         .from('collections')
-        .select('id, owner_id, title, description, is_public, created_at, updated_at, collection_color')
+        .select('id, owner_id, title, description, is_public, created_at, updated_at, collection_color, pid')
         .eq('id', collectionId)
         .maybeSingle();
 

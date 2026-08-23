@@ -1,0 +1,8 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 170" width="256" height="170">
+	<style>
+		.s0 { fill: #656565 } 
+	</style>
+	<g id="collection-shape-group">
+		<path id="collection-shape-path" fill-rule="evenodd" class="s0" d="m8 0c0 0 85.31 0 91.14 0 6.13 0 8.32 2.94 9.63 6.68 2.04 5.83 5.83 16.04 5.83 16.04 1.46 5.25 5.25 6.41 9.46 6.54 0 0 117.68-0.13 123.22-0.13 5.54 0 8.72 3.5 8.72 9.04 0 6.42 0 123.83 0 123.83 0 4.42-3.58 8-8 8h-240c-4.42 0-8-3.58-8-8v-154c0-4.42 3.58-8 8-8z"/>
+	</g>
+</svg>

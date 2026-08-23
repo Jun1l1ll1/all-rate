@@ -83,7 +83,7 @@
 
         <label>
             Rating
-            <input id="qu-rating" name="qu-rating" type="number" />
+            <input id="qu-rating" name="qu-rating" type="number" min="0" max="10" step="0.1" />
         </label>
 
         <div class="bottom-row">

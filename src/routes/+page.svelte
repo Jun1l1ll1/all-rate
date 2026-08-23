@@ -7,7 +7,7 @@
     import ConfirmPopup from '$lib/components/ConfirmPopup.svelte';
     import NewButton from '$lib/components/NewButton.svelte';
     import SideMenu from '$lib/components/SideMenu.svelte';
-
+    
     let { data, form } = $props();
     
     let editMode = $state(false);
@@ -116,16 +116,14 @@
 
             <div class="col-grid" style="--min-cell-w: 10rem; --gap: 10px">
                 {#each data.favorites as favCol (favCol.id)}
-                    <div class="col-grid-item">
-                        <button type="button" class="collection {editMode ? 'outline' : ''}"
-                            style="--bg-color: {favCol.collection_color};"
-                            use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
-                            onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${favCol.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}
-                        >
-                            <input type="checkbox" name="cid" value={favCol.id} class="edit-checkbox remove"/>
-                            <h3>{favCol.title}</h3>
-                        </button>
-                    </div>
+                    <button type="button" class="collection {editMode ? 'outline' : ''}"
+                        style="--bg-color: {favCol.collection_color};"
+                        use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
+                        onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${favCol.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}>
+
+                        <input type="checkbox" name="cid" value={favCol.id} class="edit-checkbox remove"/>
+                        <h3>{favCol.title}</h3>
+                    </button>
                 {/each}
             </div>
         {/if}
@@ -137,16 +135,14 @@
 
         <div class="col-grid" style="--min-cell-w: 10rem; --gap: 10px">
             {#each data.collections as col (col.id)}
-                <div class="col-grid-item">
-                    <button type="button" class="collection {editMode ? 'outline' : ''}"
-                        style="--bg-color: {col.collection_color};"
-                        use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
-                        onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}
-                    >
-                        <input type="checkbox" name="cid" value={col.id} class="edit-checkbox remove"/>
-                        <h3>{col.title}</h3>
-                    </button>
-                </div>
+                <button type="button" class="collection {editMode ? 'outline' : ''}"
+                    style="--bg-color: {col.collection_color};"
+                    use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
+                    onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}>
+
+                    <input type="checkbox" name="cid" value={col.id} class="edit-checkbox remove"/>
+                    <h3>{col.title}</h3>
+                </button>
             {/each}
         </div>
     </div>
@@ -173,18 +169,22 @@
         gap: var(--gap);
     }
 
-    .col-grid-item {
-        display: flex;
-        justify-content: center;
-    }
-
     .collection {
         --bg-color: #333333;
+        --collection-vector: url('src/lib/assets/collection_vector.svg');
 
         background-color: var(--bg-color);
-        width: 10rem;
-        max-width: 100%;
+        width: 100%;
         aspect-ratio: 3/2;
+
+        mask-image: var(--collection-vector);
+        mask-size: 100% 100%;
+        mask-position: center;
+        mask-repeat: no-repeat;
+        -webkit-mask-image: var(--collection-vector);
+        -webkit-mask-size: 100% 100%;
+        -webkit-mask-position: center;
+        -webkit-mask-repeat: no-repeat;
 
         &:has(> .edit-checkbox:checked) {
             outline: var(--g-outline-size) solid var(--g-highlight-color);
