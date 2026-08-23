@@ -12,6 +12,7 @@ export type Database = {
                     is_public: boolean;
                     created_at: string;
                     updated_at: string;
+                    collection_color: string;
                 };
                 Insert: {
                     id?: string;
@@ -21,6 +22,7 @@ export type Database = {
                     is_public?: boolean;
                     created_at?: string;
                     updated_at?: string;
+                    collection_color?: string;
                 };
                 Update: {
                     id?: string;
@@ -29,6 +31,7 @@ export type Database = {
                     description?: string | null;
                     is_public?: boolean;
                     updated_at?: string;
+                    collection_color?: string;
                 };
                 Relationships: [];
             };

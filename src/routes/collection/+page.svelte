@@ -80,7 +80,7 @@
 
         {:else}
             <div class="list-grid">
-                {#each data.items.sort((a, b) => b.rating - a.rating) as item (item.id)}
+                {#each data.items as item (item.id)}
                     <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}>
                         <input disabled={!editMode} type="checkbox" name="iid" value={item.id} class="edit-checkbox remove" />
                         <div class="list-rating">

@@ -1,5 +1,7 @@
 <script lang="ts">
 
+    import './create.css'
+
     function goBack() {
         if (window.history.length > 1) {
             history.back();
@@ -13,7 +15,7 @@
 </script>
 
 
- <div class="flex-row" style="--gap: 10px">
+<div class="flex-row" style="--gap: 10px">
     <button onclick={goBack} class="back-btn">&larr; Cancel</button>
 </div>
 

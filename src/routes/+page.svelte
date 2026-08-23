@@ -107,6 +107,7 @@
             {#each data.collections as col (col.id)}
                 <div class="col-grid-item">
                     <button type="button" class="collection {editMode ? 'outline' : ''}"
+                        style="--bg-color: {col.collection_color};"
                         use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
                         onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : toggleEditItem(event.currentTarget as HTMLElement)}
                     >
@@ -146,7 +147,9 @@
     }
 
     .collection {
-        background-color: #333333;
+        --bg-color: #333333;
+
+        background-color: var(--bg-color);
         width: 10rem;
         max-width: 100%;
         aspect-ratio: 3/2;

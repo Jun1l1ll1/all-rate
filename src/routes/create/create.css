@@ -1,0 +1,40 @@
+
+button {
+    background-color: var(--g-primary-color);
+    width: fit-content;
+    font-size: large;
+}
+
+input[type='text'], input[type='number'], textarea, select {
+    border-radius: var(--g-border-radius);
+    border: none;
+    background-color: var(--g-container-color);
+    padding: 5px;
+    font-size: medium;
+
+    &:focus {
+        outline: var(--g-outline-size) solid var(--g-focus-outline-color);
+    }
+}
+
+.color-inp-container {
+    --w: 100%;
+    --h: 4rem;
+
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    border: var(--g-outline-size) solid var(--g-container-color);
+    border-radius: var(--g-border-radius);
+    width: var(--w);
+    height: var(--h);
+
+    input {
+        --offset: 1rem;
+        width: calc(var(--w) + var(--offset)*2);
+        height: calc(var(--h) + var(--offset)*2);
+        position: absolute;
+        top: calc(var(--offset) * -1);
+        left: calc(var(--offset) * -1);
+    }
+}

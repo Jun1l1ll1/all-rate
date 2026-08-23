@@ -21,7 +21,8 @@ export const actions: Actions = {
                 owner_id: user.id,
                 title: formText(formData.get('title')),
                 description: formText(formData.get('description')) || null,
-                is_public: formData.get('is_private') !== 'on'
+                is_public: formData.get('is_private') !== 'on',
+                collection_color: formText(formData.get('color'))
             })
             .select('id')
             .single();

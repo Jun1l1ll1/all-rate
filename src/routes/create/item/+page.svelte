@@ -17,7 +17,7 @@
 
         <label>
             Title
-            <input name="title" required maxlength="200" />
+            <input name="title" type="text" required maxlength="200" />
         </label>
 
         <label>

@@ -10,7 +10,7 @@ export async function listUserCollections(supabase: CollectionsClient, user: Use
     ] = await Promise.all([
         supabase
             .from('collections')
-            .select('id, title, description, is_public, created_at, updated_at')
+            .select('id, title, description, is_public, created_at, updated_at, collection_color')
             .eq('owner_id', user.id)
             .order('created_at', { ascending: false }),
         supabase.from('collection_favorites').select('cid').eq('user_id', user.id)
@@ -30,7 +30,7 @@ export async function listUserCollections(supabase: CollectionsClient, user: Use
 export async function getVisibleCollection(supabase: CollectionsClient, collectionId: string) {
     const { data: collection, error: collectionError } = await supabase
         .from('collections')
-        .select('id, owner_id, title, description, is_public, created_at, updated_at')
+        .select('id, owner_id, title, description, is_public, created_at, updated_at, collection_color')
         .eq('id', collectionId)
         .maybeSingle();
 
@@ -41,8 +41,8 @@ export async function getVisibleCollection(supabase: CollectionsClient, collecti
         .from('items')
         .select('id, cid, title, rating, comment, position, created_at, updated_at')
         .eq('cid', collectionId)
-        .order('position', { ascending: true })
-        .order('created_at', { ascending: true });
+        .order('rating', { ascending: false })
+        .order('title', { ascending: true });
 
     if (itemsError) throw itemsError;
 

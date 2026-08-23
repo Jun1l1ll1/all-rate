@@ -10,19 +10,33 @@
     {/if}
 
     <form method="POST">
-        <label>
-            Title
-            <input name="title" required maxlength="120" />
+        <label style="width: 6rem;">
+            Color
+            <div class="color-inp-container">
+                <input type="color" value="#333333" name="color" />
+            </div>
         </label>
 
         <label>
-            Description
-            <textarea name="description" maxlength="2000"></textarea>
+            Title
+            <input type="text" name="title" required maxlength="120" />
+        </label>
+
+        <label>
+            Preset (not implemented)
+            <select name="preset" disabled>
+                <option value="">- None -</option>
+            </select>
         </label>
 
         <label class="checkbox-label">
             <input type="checkbox" name="is_private" />
             Private (only visible to you)
+        </label>
+
+        <label>
+            Description
+            <textarea name="description" maxlength="2000"></textarea>
         </label>
 
         <button type="submit">Create collection</button>
