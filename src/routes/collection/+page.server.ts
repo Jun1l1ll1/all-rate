@@ -2,8 +2,10 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { getVisibleCollection } from '$lib/server/collections';
 import type { PageServerLoad, Actions } from './$types';
 import { uuidPattern } from '$lib/scripts/variables';
+import { formText } from '$lib/server/validation';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
+
     const collectionId = url.searchParams.get('cid');
 
     if (!collectionId || !uuidPattern.test(collectionId)) {
@@ -11,10 +13,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     }
 
     const collection = await getVisibleCollection(locals.supabase, collectionId);
-
     if (!collection) throw error(404, 'Collection not found.');
 
-    return collection;
+    const { user = null } = await locals.safeGetSession();
+    const is_owner = user && user.id == collection.collection.owner_id
+
+    return { is_owner: is_owner, collection: collection.collection, items: collection.items };
 };
 
 export const actions: Actions = {
@@ -45,6 +49,37 @@ export const actions: Actions = {
             .delete()
             .eq('cid', collectionId)
             .in('id', itemIds);
+
+        if (deleteError) return fail(400, { error: deleteError.message });
+
+        redirect(303, `/collection?cid=${collectionId}`);
+    },
+
+    updateItem: async ({ locals, request, url }) => {
+        const { user } = await locals.safeGetSession();
+
+        if (!user) return fail(401, { error: 'Sign in to delete items.' });
+
+        const formData = await request.formData();
+        const ratingValue = formText(formData.get('qu-rating'));
+        const rating = Number(ratingValue);
+
+        const collectionId = String(
+            formData.get('cid') ?? url.searchParams.get('cid') ?? ''
+        );
+        const itemId = String(
+            formData.get('qu-iid') ?? url.searchParams.get('iid') ?? ''
+        );
+
+        if (!uuidPattern.test(collectionId) || !uuidPattern.test(itemId)) {
+            return fail(400, { error: `A valid collection and item is required. (got: iid = ${itemId}, cid = ${collectionId})` });
+        }
+
+        const { error: deleteError } = await locals.supabase
+            .from('items')
+            .update({rating: rating})
+            .eq('cid', collectionId)
+            .eq('id', itemId);
 
         if (deleteError) return fail(400, { error: deleteError.message });
 

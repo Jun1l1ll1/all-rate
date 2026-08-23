@@ -2,7 +2,7 @@
     --g-border-radius: 8px;
 
     --g-primary-color: #425866;
-    --g-error-color: #4d40ff;
+    --g-error-color: #ff4646;
     --g-container-color: #333333;
 
     --g-background-color: #181818;
@@ -54,6 +54,10 @@ button, .btn {
     &:hover::before,
     &:active::before {
         opacity: var(--g-hover-opasity);
+    }
+
+    &:disabled::before {
+        opacity: 0;
     }
 }
 

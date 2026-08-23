@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
     const { collections, favorites } = await listUserCollections(locals.supabase, user);
 
-    return { user: { id: user.id, email: user.email ?? null }, collections, favorites };
+    return { user: { id: user.id }, collections, favorites };
 };
 
 export const actions: Actions = {

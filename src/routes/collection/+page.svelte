@@ -23,7 +23,7 @@
         toggleEditMode(true);
     }
 
-    function openConfirmPopup(popupId: string) {
+    function openPopup(popupId: string) {
         const popup = document.getElementById(popupId) as HTMLDialogElement | null;
         if (popup) popup.showModal();
     }
@@ -40,7 +40,11 @@
     <button onclick={() => {window.location.href = '/'}} class="back-btn">&larr;</button>
     <h1>{data.collection.title}</h1>
     {#if data.collection.is_public}
-        <button onclick={(e) => {copyText(e, window.location.href)}}>Share</button>
+        {#if data.is_owner}
+            <button onclick={(e) => {copyText(e, window.location.href)}}>Share</button>
+        {:else}
+            <span>(Read only)</span>
+        {/if}
     {:else}
         <span>(Private)</span>
     {/if}
@@ -51,26 +55,39 @@
         msg="Are you sure you want to delete the selected items?"
         submitBtnText="Delete"
         formAction="?/deleteItems&cid={data.collection.id}" />
+    
+    <dialog id="quick-update-popup">
+        <input type="hidden" id="qu-iid" name="qu-iid" value="" />
+        <h3>Quick update <span id="qu-item-name"></span></h3>
+        <input id="qu-rating" name="qu-rating" type="number" />
+        <button type="submit" formaction="?/updateItem&cid={data.collection.id}">Update</button>
+        <button type="button" onclick={() => {
+            const dialog = document.getElementById('quick-update-popup') as HTMLDialogElement | null;
+            if (dialog) dialog.close();
+        }}>Cancel</button>
+    </dialog>
 
     <div class="flex-row top-menu">
         <div>
         
         </div>
         <div>
-            <button 
-                type="button"
-                onclick={() => { openConfirmPopup('delete-popup') }}
-                class="{!editMode ? 'remove' : ''}">Delete</button>
-            <label for="edit-chbx" class="btn">
-                {#if editMode} Exit edit mode {:else} Edit {/if}
-                <input id="edit-chbx"
-                    type="checkbox"
-                    name="edit-chbx"
-                    class="remove"
-                    onchange={(e) => {
-                        if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
-                    }} />
-            </label>
+            {#if data.is_owner}
+                <button 
+                    type="button"
+                    onclick={() => { openPopup('delete-popup') }}
+                    class="{!editMode ? 'remove' : ''}">Delete</button>
+                <label for="edit-chbx" class="btn">
+                    {#if editMode} Exit edit mode {:else} Edit {/if}
+                    <input id="edit-chbx"
+                        type="checkbox"
+                        name="edit-chbx"
+                        class="remove"
+                        onchange={(e) => {
+                            if (e.target instanceof HTMLInputElement) toggleEditMode(e.target.checked);
+                        }} />
+                </label>
+            {/if}
         </div>
     </div>
 
@@ -81,11 +98,21 @@
         {:else}
             <div class="list-grid">
                 {#each data.items as item (item.id)}
-                    <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => longselectListItem(ele) }}>
+                    <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => { if (data.is_owner) longselectListItem(ele) } }}>
                         <input disabled={!editMode} type="checkbox" name="iid" value={item.id} class="edit-checkbox remove" />
-                        <div class="list-rating">
+                        <button class="list-rating"
+                            disabled={editMode || !data.is_owner}
+                            type="button"
+                            onclick={(e: Event) => {
+                                if (!editMode && e.target instanceof HTMLButtonElement) {
+                                    (document.getElementById('qu-iid') as HTMLInputElement).value = item.id;
+                                    (document.getElementById('qu-rating') as HTMLInputElement).value = String(item.rating);
+                                    (document.getElementById('qu-item-name') as HTMLSpanElement).innerText = item.title;
+                                    openPopup('quick-update-popup');
+                                }
+                            }}>
                             <h3>{item.rating}</h3>
-                        </div>
+                        </button>
 
                         <div class="flex-column list-item-right">
                             <h2 class="list-title">{item.title}</h2>
@@ -100,7 +127,9 @@
     </div>
 </form>
 
-<NewButton type="item" collectionId={data.collection.id} />
+{#if data.is_owner}
+    <NewButton type="item" collectionId={data.collection.id} />
+{/if}
 {#if form?.error}
     <DiscreteErrorMessage errorMessage={form.error} />
 {/if}
@@ -118,7 +147,7 @@
         grid-template-columns: subgrid;
         background-color: #333333;
         text-align: left;
-        padding: 5px 10px;
+        padding: 5px 10px 5px 5px;
         gap: 10px;
         border-radius: var(--g-border-radius);
 
@@ -128,7 +157,9 @@
     }
 
     .list-rating {
-        border-radius: 10px 0 0 10px;
+        border-radius: var(--g-border-radius);
+        padding: 0 5px;
+        background-color: transparent;
 
         > h3 {
             margin: 0;

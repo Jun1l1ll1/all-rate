@@ -10,8 +10,7 @@ export const actions: Actions = {
 		if (!user) return fail(401, { error: 'Sign in to create an item.' });
 
 		const formData = await request.formData();
-		const collectionId =
-			formText(formData.get('cid')) || url.searchParams.get('cid') || '';
+		const collectionId = formText(formData.get('cid')) || url.searchParams.get('cid') || '';
 		const titleError = requiredText(formData.get('title'), 'Title', 200);
 		const commentError = optionalText(formData.get('comment'), 5000);
 		const ratingValue = formText(formData.get('rating'));
