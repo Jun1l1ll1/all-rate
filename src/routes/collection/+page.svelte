@@ -24,10 +24,13 @@
     }
     
     function longselectListItem(node: HTMLElement) {
-        (document.getElementById('edit-chbx') as HTMLInputElement).checked = true;
-        updateSelectedCount(true)
-        toggleEditItem(node, true);
-        toggleEditMode(true);
+        const chbx = document.getElementById('edit-chbx') as HTMLInputElement;
+        if (!chbx.checked) {
+            chbx.checked = true;
+            updateSelectedCount(true);
+            toggleEditItem(node, true);
+            toggleEditMode(true);
+        }
     }
 
     function openPopup(popupId: string) {

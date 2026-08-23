@@ -7,7 +7,7 @@
     import ConfirmPopup from '$lib/components/ConfirmPopup.svelte';
     import NewButton from '$lib/components/NewButton.svelte';
     import SideMenu from '$lib/components/SideMenu.svelte';
-    
+
     let { data, form } = $props();
     
     let editMode = $state(false);
@@ -24,10 +24,13 @@
     }
 
     function longselectCollection(node: HTMLElement) {
-        (document.getElementById('edit-chbx') as HTMLInputElement).checked = true;
-        updateSelectedCount(true);
-        toggleEditItem(node, true);
-        toggleEditMode(true);
+        const chbx = document.getElementById('edit-chbx') as HTMLInputElement;
+        if (!chbx.checked) {
+            chbx.checked = true;
+            updateSelectedCount(true);
+            toggleEditItem(node, true);
+            toggleEditMode(true);
+        }
     }
 
     function openConfirmPopup(popupId: string) {
@@ -116,14 +119,22 @@
 
             <div class="col-grid" style="--min-cell-w: 10rem; --gap: 10px">
                 {#each data.favorites as favCol (favCol.id)}
-                    <button type="button" class="collection {editMode ? 'outline' : ''}"
-                        style="--bg-color: {favCol.collection_color};"
-                        use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
-                        onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${favCol.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}>
+                    <div class="collection-container">
+                        <button type="button" class="collection"
+                            style="--bg-color: {favCol.collection_color};"
+                            use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
+                            onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${favCol.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}>
 
-                        <input type="checkbox" name="cid" value={favCol.id} class="edit-checkbox remove"/>
-                        <h3>{favCol.title}</h3>
-                    </button>
+                            <input type="checkbox" name="cid" value={favCol.id} class="edit-checkbox remove"/>
+                            <h3>{favCol.title}</h3>
+                        </button>
+
+                        {#if editMode}
+                            <svg class="collection-outline" viewBox="0 0 256 170" aria-hidden="true">
+                                <path d="m8 0c0 0 85.31 0 91.14 0 6.13 0 8.32 2.94 9.63 6.68 2.04 5.83 5.83 16.04 5.83 16.04 1.46 5.25 5.25 6.41 9.46 6.54 0 0 117.68-0.13 123.22-0.13 5.54 0 8.72 3.5 8.72 9.04 0 6.42 0 123.83 0 123.83 0 4.42-3.58 8-8 8h-240c-4.42 0-8-3.58-8-8v-154c0-4.42 3.58-8 8-8z"/>
+                            </svg>
+                        {/if}
+                    </div>
                 {/each}
             </div>
         {/if}
@@ -135,7 +146,8 @@
 
         <div class="col-grid" style="--min-cell-w: 10rem; --gap: 10px">
             {#each data.collections as col (col.id)}
-                <button type="button" class="collection {editMode ? 'outline' : ''}"
+            <div class="collection-container">
+                <button type="button" class="collection"
                     style="--bg-color: {col.collection_color};"
                     use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
                     onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}>
@@ -143,6 +155,13 @@
                     <input type="checkbox" name="cid" value={col.id} class="edit-checkbox remove"/>
                     <h3>{col.title}</h3>
                 </button>
+
+                {#if editMode}
+                    <svg class="collection-outline" viewBox="0 0 256 170" aria-hidden="true">
+                        <path d="m8 0c0 0 85.31 0 91.14 0 6.13 0 8.32 2.94 9.63 6.68 2.04 5.83 5.83 16.04 5.83 16.04 1.46 5.25 5.25 6.41 9.46 6.54 0 0 117.68-0.13 123.22-0.13 5.54 0 8.72 3.5 8.72 9.04 0 6.42 0 123.83 0 123.83 0 4.42-3.58 8-8 8h-240c-4.42 0-8-3.58-8-8v-154c0-4.42 3.58-8 8-8z" />
+                    </svg>
+                {/if}
+            </div>
             {/each}
         </div>
     </div>
@@ -169,13 +188,37 @@
         gap: var(--gap);
     }
 
+    .collection-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 3/2;
+
+        &:has(.edit-checkbox:checked) .collection-outline path {
+            stroke: var(--g-highlight-color);
+        }
+    }
+
+    .collection-outline {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+
+        path {
+            fill: none;
+            stroke: var(--g-focus-outline-color);
+            stroke-width: var(--g-outline-size);
+        }
+    }
+
     .collection {
         --bg-color: #333333;
         --collection-vector: url('src/lib/assets/collection_vector.svg');
 
-        background-color: var(--bg-color);
         width: 100%;
-        aspect-ratio: 3/2;
+        height: 100%;
+        background-color: var(--bg-color);
 
         mask-image: var(--collection-vector);
         mask-size: 100% 100%;
@@ -185,9 +228,5 @@
         -webkit-mask-size: 100% 100%;
         -webkit-mask-position: center;
         -webkit-mask-repeat: no-repeat;
-
-        &:has(> .edit-checkbox:checked) {
-            outline: var(--g-outline-size) solid var(--g-highlight-color);
-        }
     }
 </style>
