@@ -41,6 +41,7 @@ button, .btn {
     padding-inline: 6px;
     color: var(--g-text-color);
     text-decoration: none;
+    font-size: 1rem;
 
     &::before {
         content: '';

@@ -1,15 +1,13 @@
 <script lang="ts">
+    import DiscreteErrorMessage from '$lib/components/DiscreteErrorMessage.svelte';
+
     let { data, form } = $props();
 </script>
 
-<main class="form-content">
+<div class="main-content">
     <h1>{#if !data.collection}New{:else}Update{/if} collection</h1>
 
-    {#if form?.error}
-        <p class="form-error">{form.error}</p>
-    {/if}
-
-    <form method="POST">
+    <form class="create-form" method="POST">
         <input type="hidden" name="cid" value="{data.collection?.id || ''}" />
 
         <label style="width: 6rem;">
@@ -41,35 +39,10 @@
             <textarea name="description" maxlength="2000">{data.collection?.description || ''}</textarea>
         </label>
 
-        <button type="submit">{#if !data.collection}Create{:else}Update{/if} collection</button>
+        <button type="submit" class="update-btn">{#if !data.collection}Create{:else}Update{/if} collection</button>
     </form>
-</main>
+</div>
 
-<style>
-    .form-content {
-        padding: 1rem;
-        max-width: 40rem;
-    }
-
-    form,
-    label {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    form {
-        gap: 1rem;
-    }
-    .checkbox-label {
-        flex-direction: row;
-        align-items: center;
-    }
-    textarea {
-        min-height: 6rem;
-        resize: vertical;
-    }
-    .form-error {
-        color: #ff8f8f;
-    }
-</style>
+{#if form?.error}
+    <DiscreteErrorMessage errorMessage={form.error} />
+{/if}
