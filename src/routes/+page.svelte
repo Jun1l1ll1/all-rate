@@ -11,17 +11,21 @@
     let { data, form } = $props();
     
     let editMode = $state(false);
+    let selectedCount = $state(0);
 
     function toggleEditMode(enabled?: boolean) {
         if (enabled === undefined) editMode = !editMode;
         else editMode = enabled;
         
-        if (!editMode) uncheckAllEditCheckboxes();
+        if (!editMode) {
+            uncheckAllEditCheckboxes();
+            selectedCount = 0;
+        }
     }
 
     function longselectCollection(node: HTMLElement) {
-        const editChbx = document.getElementById('edit-chbx') as HTMLInputElement | null;
-        if (editChbx) editChbx.checked = true;
+        (document.getElementById('edit-chbx') as HTMLInputElement).checked = true;
+        updateSelectedCount(true);
         toggleEditItem(node, true);
         toggleEditMode(true);
     }
@@ -29,6 +33,16 @@
     function openConfirmPopup(popupId: string) {
         const popup = document.getElementById(popupId) as HTMLDialogElement | null;
         if (popup) popup.showModal();
+    }
+
+    function collectionClicked(node: HTMLElement) {
+        toggleEditItem(node);
+        updateSelectedCount((node.querySelector('input') as HTMLInputElement).checked);
+    }
+
+    function updateSelectedCount(newCheckedStatus: boolean) {
+        if (newCheckedStatus) selectedCount++;
+        else selectedCount--;
     }
 
 </script>
@@ -56,14 +70,17 @@
         <div>
             <button 
                 type="submit"
+                disabled={selectedCount < 1}
                 formaction="?/favoriteCollections"
                 class="{!editMode ? 'remove' : ''}">Favorite</button>
             <button 
                 type="submit"
+                disabled={selectedCount < 1}
                 formaction="?/unFavoriteCollections"
                 class="{!editMode ? 'remove' : ''}">Un-favorite</button>
             <button 
                 type="button"
+                disabled={selectedCount < 1}
                 onclick={() => { openConfirmPopup('delete-popup') }}
                 class="{!editMode ? 'remove' : ''}">Delete</button>
             <label for="edit-chbx" class="btn">
@@ -87,8 +104,9 @@
                 {#each data.favorites as favCol (favCol.id)}
                     <div class="col-grid-item">
                         <button type="button" class="collection {editMode ? 'outline' : ''}"
+                            style="--bg-color: {favCol.collection_color};"
                             use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
-                            onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${favCol.id}`)) : toggleEditItem(event.currentTarget as HTMLElement)}
+                            onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${favCol.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}
                         >
                             <input type="checkbox" name="cid" value={favCol.id} class="edit-checkbox remove"/>
                             <h3>{favCol.title}</h3>
@@ -109,7 +127,7 @@
                     <button type="button" class="collection {editMode ? 'outline' : ''}"
                         style="--bg-color: {col.collection_color};"
                         use:longpress={{ threshold: 500, callback: (ele) => longselectCollection(ele) }}
-                        onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : toggleEditItem(event.currentTarget as HTMLElement)}
+                        onclick={(event) => !editMode ? goto(resolve(`/collection?cid=${col.id}`)) : collectionClicked(event.currentTarget as HTMLElement)}
                     >
                         <input type="checkbox" name="cid" value={col.id} class="edit-checkbox remove"/>
                         <h3>{col.title}</h3>

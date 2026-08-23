@@ -8,17 +8,21 @@
     let { data, form } = $props();
 
     let editMode = $state(false);
+    let selectedCount = $state(0);
     
     function toggleEditMode(enabled?: boolean) {
         if (enabled === undefined) editMode = !editMode;
         else editMode = enabled;
         
-        if (!editMode) uncheckAllEditCheckboxes();
+        if (!editMode) {
+            uncheckAllEditCheckboxes();
+            selectedCount = 0;
+        }
     }
     
     function longselectListItem(node: HTMLElement) {
-        const editChbx = document.getElementById('edit-chbx') as HTMLInputElement | null;
-        if (editChbx) editChbx.checked = true;
+        (document.getElementById('edit-chbx') as HTMLInputElement).checked = true;
+        updateSelectedCount(true)
         toggleEditItem(node, true);
         toggleEditMode(true);
     }
@@ -32,6 +36,11 @@
         navigator.clipboard.writeText(text);
         let copyBtn = e.target as HTMLDialogElement | null;
         if (copyBtn) copyBtn.innerText = 'URL copied!';
+    }
+
+    function updateSelectedCount(newCheckedStatus: boolean) {
+        if (newCheckedStatus) selectedCount++;
+        else selectedCount--;
     }
 
 </script>
@@ -75,6 +84,7 @@
             {#if data.is_owner}
                 <button 
                     type="button"
+                    disabled={selectedCount < 1}
                     onclick={() => { openPopup('delete-popup') }}
                     class="{!editMode ? 'remove' : ''}">Delete</button>
                 <label for="edit-chbx" class="btn">
@@ -98,8 +108,17 @@
         {:else}
             <div class="list-grid">
                 {#each data.items as item (item.id)}
-                    <label class="list-item {editMode ? 'outline btn' : ''}" use:longpress={{ threshold: 500, callback: (ele) => { if (data.is_owner) longselectListItem(ele) } }}>
-                        <input disabled={!editMode} type="checkbox" name="iid" value={item.id} class="edit-checkbox remove" />
+                    <label class="list-item {editMode ? 'outline btn' : ''}"
+                    style="--bg-color: {data.collection.collection_color};"
+                        use:longpress={{ threshold: 500, callback: (ele) => {
+                            if (data.is_owner) longselectListItem(ele)
+                        }}}>
+                        <input name="iid"
+                            onchange={(e: Event) => updateSelectedCount((e.target as HTMLInputElement).checked)}
+                            disabled={!editMode}
+                            type="checkbox"
+                            value={item.id}
+                            class="edit-checkbox remove" />
                         <button class="list-rating"
                             disabled={editMode || !data.is_owner}
                             type="button"
@@ -142,10 +161,12 @@
     }
 
     .list-item {
+        --bg-color: #333333;
+
         display: grid;
         grid-column: 1 / -1;
         grid-template-columns: subgrid;
-        background-color: #333333;
+        background-color: var(--bg-color);
         text-align: left;
         padding: 5px 10px 5px 5px;
         gap: 10px;
