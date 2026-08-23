@@ -96,7 +96,7 @@
                 type="button"
                 disabled={selectedCount !== 1}
                 onclick={() => goto(resolve(`/update/collection?cid=${getSelectedIds()[0]}&from=/`))}
-                class="{!editMode ? 'remove' : ''}">Edit collection</button>
+                class="{!editMode ? 'remove' : ''}">Edit selected</button>
             <label for="edit-chbx" class="btn">
                 {#if editMode} Exit edit mode {:else} Edit {/if}
                 <input id="edit-chbx"

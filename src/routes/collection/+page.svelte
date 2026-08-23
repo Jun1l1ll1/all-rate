@@ -46,6 +46,15 @@
         else selectedCount--;
     }
 
+    function getSelectedIds() {
+        const iidElements = document.getElementsByName('iid');
+        let iids: string[] = [];
+        iidElements.forEach(ele => {
+            if (ele instanceof HTMLInputElement) iids.push(ele.value);
+        });
+        return iids;
+    }
+
 </script>
 
 <div class="flex-row" style="--gap: 10px">
@@ -97,6 +106,11 @@
                     disabled={selectedCount < 1}
                     onclick={() => { openPopup('delete-popup') }}
                     class="{!editMode ? 'remove' : ''}">Delete</button>
+                <button 
+                    type="button"
+                    disabled={selectedCount !== 1}
+                    onclick={() => goto(resolve(`/update/item?cid=${data.collection.id}&iid=${getSelectedIds()[0]}&from=${page.url.pathname}${page.url.search}`))}
+                    class="{!editMode ? 'remove' : ''}">Edit selected</button>
                 <button 
                     type="button"
                     onclick={() => goto(resolve(`/update/collection?cid=${data.collection.id}&from=${page.url.pathname}${page.url.search}`))}

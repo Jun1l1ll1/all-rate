@@ -1,8 +1,27 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, error, redirect } from '@sveltejs/kit';
+import { getItem } from '$lib/server/items';
 import { formText, optionalText, requiredText } from '$lib/server/validation';
-import type { Actions } from './$types';
+import type { PageServerLoad, Actions } from './$types';
+import { uuidPattern } from '$lib/scripts/variables';
 
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+export const load: PageServerLoad = async ({ locals, url }) => {
+
+	const collectionId = url.searchParams.get('cid');
+	const itemId = url.searchParams.get('iid');
+
+	if (!collectionId || !uuidPattern.test(collectionId)) {
+		throw error(400, 'A valid collection id is required.');
+	}
+
+	if (itemId && !uuidPattern.test(itemId)) {
+		throw error(400, 'The given item id is invalid.');
+	}
+
+	const item = itemId ? await getItem(locals.supabase, itemId) : null;
+	if (itemId && !item) throw error(404, 'Item not found.');
+
+	return { cid: collectionId, item: item };
+};
 
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
@@ -10,6 +29,8 @@ export const actions: Actions = {
 		if (!user) return fail(401, { error: 'Sign in to update an item.' });
 
 		const formData = await request.formData();
+		const redirectPath = url.searchParams.get('from') || '/';
+		const updateItemId = formText(formData.get('iid')) || url.searchParams.get('iid') || '';
 		const collectionId = formText(formData.get('cid')) || url.searchParams.get('cid') || '';
 		const titleError = requiredText(formData.get('title'), 'Title', 200);
 		const commentError = optionalText(formData.get('comment'), 5000);
@@ -30,25 +51,40 @@ export const actions: Actions = {
 			});
 		}
 
-		const { data: lastItem, error: lastItemError } = await locals.supabase
-			.from('items')
-			.select('position')
-			.eq('cid', collectionId)
-			.order('position', { ascending: false })
-			.limit(1)
-			.maybeSingle();
+        if (updateItemId) {
+            const { error } = await locals.supabase
+                .from('items')
+                .update({
+					title: formText(formData.get('title')),
+					rating,
+					comment: formText(formData.get('comment')) || null
+                })
+                .eq('id', updateItemId)
+                .single();
+    
+            if (error) return fail(400, { error: error.message });
+        } else {
+			const { data: lastItem, error: lastItemError } = await locals.supabase
+				.from('items')
+				.select('position')
+				.eq('cid', collectionId)
+				.order('position', { ascending: false })
+				.limit(1)
+				.maybeSingle();
 
-		if (lastItemError) return fail(400, { error: lastItemError.message });
+			if (lastItemError) return fail(400, { error: lastItemError.message });
 
-		const { error } = await locals.supabase.from('items').insert({
-			cid: collectionId,
-			title: formText(formData.get('title')),
-			rating,
-			comment: formText(formData.get('comment')) || null,
-			position: (lastItem?.position ?? -1) + 1
-		});
+			const { error } = await locals.supabase.from('items').insert({
+				cid: collectionId,
+				title: formText(formData.get('title')),
+				rating,
+				comment: formText(formData.get('comment')) || null,
+				position: (lastItem?.position ?? -1) + 1
+			});
 
-		if (error) return fail(400, { error: error.message });
-		redirect(303, `/collection?cid=${collectionId}`);
+			if (error) return fail(400, { error: error.message });
+		}
+
+		redirect(303, redirectPath);
 	}
 };
