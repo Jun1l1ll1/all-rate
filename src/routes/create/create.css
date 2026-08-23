@@ -5,18 +5,6 @@ button {
     font-size: large;
 }
 
-input[type='text'], input[type='number'], textarea, select {
-    border-radius: var(--g-border-radius);
-    border: none;
-    background-color: var(--g-container-color);
-    padding: 5px;
-    font-size: medium;
-
-    &:focus {
-        outline: var(--g-outline-size) solid var(--g-focus-outline-color);
-    }
-}
-
 .color-inp-container {
     --w: 100%;
     --h: 4rem;

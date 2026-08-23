@@ -65,15 +65,22 @@
         submitBtnText="Delete"
         formAction="?/deleteItems&cid={data.collection.id}" />
     
-    <dialog id="quick-update-popup">
+    <dialog id="quick-update-popup" class="quick-update-popup">
         <input type="hidden" id="qu-iid" name="qu-iid" value="" />
         <h3>Quick update <span id="qu-item-name"></span></h3>
-        <input id="qu-rating" name="qu-rating" type="number" />
-        <button type="submit" formaction="?/updateItem&cid={data.collection.id}">Update</button>
-        <button type="button" onclick={() => {
-            const dialog = document.getElementById('quick-update-popup') as HTMLDialogElement | null;
-            if (dialog) dialog.close();
-        }}>Cancel</button>
+
+        <label>
+            Rating
+            <input id="qu-rating" name="qu-rating" type="number" />
+        </label>
+
+        <div class="bottom-row">
+            <button type="submit" formaction="?/updateItem&cid={data.collection.id}">Update</button>
+            <button type="button" onclick={() => {
+                const dialog = document.getElementById('quick-update-popup') as HTMLDialogElement | null;
+                if (dialog) dialog.close();
+            }}>Cancel</button>
+        </div>
     </dialog>
 
     <div class="flex-row top-menu">

@@ -61,6 +61,58 @@ button, .btn {
     }
 }
 
+dialog {
+    &[open] {
+        border: none;
+        box-shadow: 0 0 50px 10px #000000;
+        background-color: var(--g-container-color);
+        border-radius: var(--g-border-radius);
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        input {
+            --bg-color: var(--g-background-color);
+        }
+        button, .btn {
+            background-color: var(--g-background-color);
+            font-size: medium;
+            padding: 5px 10px;
+        }
+    }
+
+    &::backdrop {
+        backdrop-filter: blur(5px);
+    }
+
+    h1, h2, h3 {
+        margin-top: 0;
+    }
+    
+    .bottom-row {
+        display: flex;
+        gap: 10px;
+        justify-content: end;
+        margin-top: 10px;
+    }
+}
+
+input[type='text'], input[type='number'], textarea, select {
+    --bg-color: var(--g-container-color);
+
+    border-radius: var(--g-border-radius);
+    border: none;
+    background-color: var(--bg-color);
+    padding: 5px;
+    font-size: medium;
+
+    &:focus {
+        outline: var(--g-outline-size) solid var(--g-focus-outline-color);
+    }
+}
+
 .flex-row {
     --gap: 0px;
 
