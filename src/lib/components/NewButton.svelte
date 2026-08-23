@@ -4,19 +4,19 @@
 
     type ValidType = 'collection' | 'item';
 
-    let { type = 'item', collectionId }: { type: ValidType; collectionId?: string } = $props();
+    let { type = 'item', pathname = '/', collectionId }: { type: ValidType; pathname?: string; collectionId?: string } = $props();
 
     const destination = $derived(
         type === 'item' && collectionId
-            ? `/create/item?cid=${encodeURIComponent(collectionId)}`
-            : `/create/${type}`
+            ? `/update/item?cid=${encodeURIComponent(collectionId)}&from=${pathname}`
+            : `/update/${type}?from=${pathname}`
     );
 </script>
 
 <button
     class="new-btn"
     type="button"
-    onclick={() => goto(resolve(destination as `/create/item?${string}` | '/create/collection'))}
+    onclick={() => goto(resolve(destination as `/update/item?${string}` | `/update/collection?${string}`))}
     >+</button
 >
 

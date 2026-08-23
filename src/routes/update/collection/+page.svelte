@@ -1,25 +1,27 @@
 <script lang="ts">
-    let { form } = $props();
+    let { data, form } = $props();
 </script>
 
 <main class="form-content">
-    <h1>New collection</h1>
+    <h1>{#if !data.collection}New{:else}Update{/if} collection</h1>
 
     {#if form?.error}
         <p class="form-error">{form.error}</p>
     {/if}
 
     <form method="POST">
+        <input type="hidden" name="cid" value="{data.collection?.id || ''}" />
+
         <label style="width: 6rem;">
             Color
             <div class="color-inp-container">
-                <input type="color" value="#333333" name="color" />
+                <input type="color" value="{data.collection?.collection_color || '#333333'}" name="color" />
             </div>
         </label>
 
         <label>
             Title
-            <input type="text" name="title" required maxlength="120" />
+            <input type="text" name="title" required maxlength="120" value="{data.collection?.title || ''}" />
         </label>
 
         <label>
@@ -30,16 +32,16 @@
         </label>
 
         <label class="checkbox-label">
-            <input type="checkbox" name="is_private" />
+            <input type="checkbox" name="is_private" checked={!data.collection?.is_public} />
             Private (only visible to you)
         </label>
 
         <label>
             Description
-            <textarea name="description" maxlength="2000"></textarea>
+            <textarea name="description" maxlength="2000">{data.collection?.description || ''}</textarea>
         </label>
 
-        <button type="submit">Create collection</button>
+        <button type="submit">{#if !data.collection}Create{:else}Update{/if} collection</button>
     </form>
 </main>
 

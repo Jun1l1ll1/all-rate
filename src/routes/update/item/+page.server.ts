@@ -7,7 +7,7 @@ const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
 		const { user } = await locals.safeGetSession();
-		if (!user) return fail(401, { error: 'Sign in to create an item.' });
+		if (!user) return fail(401, { error: 'Sign in to update an item.' });
 
 		const formData = await request.formData();
 		const collectionId = formText(formData.get('cid')) || url.searchParams.get('cid') || '';

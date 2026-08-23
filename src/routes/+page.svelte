@@ -45,6 +45,15 @@
         else selectedCount--;
     }
 
+    function getSelectedIds() {
+        const cidElements = document.getElementsByName('cid');
+        let cids: string[] = [];
+        cidElements.forEach(ele => {
+            if (ele instanceof HTMLInputElement) cids.push(ele.value);
+        });
+        return cids;
+    }
+
 </script>
 
 
@@ -83,6 +92,11 @@
                 disabled={selectedCount < 1}
                 onclick={() => { openConfirmPopup('delete-popup') }}
                 class="{!editMode ? 'remove' : ''}">Delete</button>
+            <button 
+                type="button"
+                disabled={selectedCount !== 1}
+                onclick={() => goto(resolve(`/update/collection?cid=${getSelectedIds()[0]}&from=/`))}
+                class="{!editMode ? 'remove' : ''}">Edit collection</button>
             <label for="edit-chbx" class="btn">
                 {#if editMode} Exit edit mode {:else} Edit {/if}
                 <input id="edit-chbx"
@@ -140,7 +154,7 @@
 {/if}
 
 {#if data.user}
-    <NewButton type="collection" />
+    <NewButton type="collection" pathname="/" />
 
     {#if form?.error}
         <DiscreteErrorMessage errorMessage={form.error} />

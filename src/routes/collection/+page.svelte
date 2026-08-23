@@ -1,9 +1,12 @@
 <script lang="ts">
     import { longpress, uncheckAllEditCheckboxes, toggleEditItem } from '$lib/scripts/common';
+    import { goto } from '$app/navigation';
+    import { resolve } from '$app/paths';
     
     import DiscreteErrorMessage from '$lib/components/DiscreteErrorMessage.svelte';
     import ConfirmPopup from '$lib/components/ConfirmPopup.svelte';
     import NewButton from '$lib/components/NewButton.svelte';
+    import { page } from '$app/state';
 
     let { data, form } = $props();
 
@@ -94,6 +97,10 @@
                     disabled={selectedCount < 1}
                     onclick={() => { openPopup('delete-popup') }}
                     class="{!editMode ? 'remove' : ''}">Delete</button>
+                <button 
+                    type="button"
+                    onclick={() => goto(resolve(`/update/collection?cid=${data.collection.id}&from=${page.url.pathname}${page.url.search}`))}
+                    class="{!editMode ? 'remove' : ''}">Edit collection</button>
                 <label for="edit-chbx" class="btn">
                     {#if editMode} Exit edit mode {:else} Edit {/if}
                     <input id="edit-chbx"
@@ -154,7 +161,7 @@
 </form>
 
 {#if data.is_owner}
-    <NewButton type="item" collectionId={data.collection.id} />
+    <NewButton type="item" collectionId={data.collection.id} pathname={page.url.pathname + page.url.search} />
 {/if}
 {#if form?.error}
     <DiscreteErrorMessage errorMessage={form.error} />

@@ -27,7 +27,7 @@ export async function listUserCollections(supabase: CollectionsClient, user: Use
     };
 }
 
-export async function getVisibleCollection(supabase: CollectionsClient, collectionId: string) {
+export async function getCollectionAndItems(supabase: CollectionsClient, collectionId: string) {
     const { data: collection, error: collectionError } = await supabase
         .from('collections')
         .select('id, owner_id, title, description, is_public, created_at, updated_at, collection_color')
@@ -47,4 +47,16 @@ export async function getVisibleCollection(supabase: CollectionsClient, collecti
     if (itemsError) throw itemsError;
 
     return { collection, items: items ?? [] };
+}
+
+export async function getCollection(supabase: CollectionsClient, collectionId: string) {
+    const { data: collection, error: collectionError } = await supabase
+        .from('collections')
+        .select('id, owner_id, title, description, is_public, created_at, updated_at, collection_color')
+        .eq('id', collectionId)
+        .maybeSingle();
+
+    if (collectionError) throw collectionError;
+
+    return collection;
 }

@@ -1,5 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { getVisibleCollection } from '$lib/server/collections';
+import { getCollectionAndItems } from '$lib/server/collections';
 import type { PageServerLoad, Actions } from './$types';
 import { uuidPattern } from '$lib/scripts/variables';
 import { formText } from '$lib/server/validation';
@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         throw error(400, 'A valid collection id is required.');
     }
 
-    const collection = await getVisibleCollection(locals.supabase, collectionId);
+    const collection = await getCollectionAndItems(locals.supabase, collectionId);
     if (!collection) throw error(404, 'Collection not found.');
 
     const { user = null } = await locals.safeGetSession();
