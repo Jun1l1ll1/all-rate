@@ -175,7 +175,9 @@
 
     <div class="flex-row top-menu">
         <div>
-        
+            {#if data.preset}
+                <span>{data.preset.name}</span>
+            {/if}
         </div>
         <div>
             {#if data.is_owner}

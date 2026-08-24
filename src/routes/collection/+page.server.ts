@@ -1,5 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { getCollectionAndItems } from '$lib/server/collections';
+import { getPreset } from '$lib/server/presets';
 import type { PageServerLoad, Actions } from './$types';
 import { uuidPattern } from '$lib/scripts/variables';
 import { formText } from '$lib/server/validation';
@@ -18,7 +19,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     const { user = null } = await locals.safeGetSession();
     const is_owner = user && user.id == collection.collection.owner_id
 
-    return { is_owner: is_owner, collection: collection.collection, items: collection.items };
+    const preset = collection.collection.pid ? await getPreset(locals.supabase, collection.collection.pid) : null
+    if (collection.collection.pid && !preset) throw error(404, 'Preset not found.');
+    
+    return { is_owner: is_owner, collection: collection.collection, items: collection.items, preset };
 };
 
 export const actions: Actions = {
