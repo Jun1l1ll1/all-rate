@@ -1,10 +1,24 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
+    import type { Snippet } from 'svelte';
 
     type ValidType = 'collection' | 'item';
+    type DestinationType = `/update/item?${string}` | `/update/collection?${string}`;
 
-    let { type = 'item', pathname = '/', collectionId }: { type: ValidType; pathname?: string; collectionId?: string } = $props();
+    let {
+        children,
+        type = 'item',
+        pathname = '/',
+        collectionId,
+        usePopup = false
+    }: {
+        children?: Snippet;
+        type: ValidType;
+        pathname?: string;
+        collectionId?: string;
+        usePopup?: boolean;
+    } = $props();
 
     const destination = $derived(
         type === 'item' && collectionId
@@ -13,12 +27,24 @@
     );
 </script>
 
+
+<dialog id="new-button-popup" class="new-button-popup">
+    {#if children}
+        {@render children()}
+    {/if}
+</dialog>
+
 <button
     class="new-btn"
     type="button"
-    onclick={() => goto(resolve(destination as `/update/item?${string}` | `/update/collection?${string}`))}
-    >+</button
->
+    onclick={() => {
+        if (usePopup) (document.getElementById('new-button-popup') as HTMLDialogElement).showModal();
+        else goto(resolve(destination as DestinationType));
+    }}>
+    
+    +
+</button>
+
 
 <style>
     .new-btn {

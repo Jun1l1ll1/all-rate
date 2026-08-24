@@ -46,6 +46,7 @@ export type Database = {
                     rating: number;
                     comment: string | null;
                     position: number;
+                    external_id: string | null;
                     created_at: string;
                     updated_at: string;
                 };
@@ -56,6 +57,7 @@ export type Database = {
                     rating: number;
                     comment?: string | null;
                     position?: number;
+                    external_id?: string | null;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -66,6 +68,7 @@ export type Database = {
                     rating?: number;
                     comment?: string | null;
                     position?: number;
+                    external_id?: string | null;
                     updated_at?: string;
                 };
                 Relationships: [];
@@ -74,19 +77,21 @@ export type Database = {
                 Row: {
                     id: string;
                     name: string;
+                    key: string;
                     created_at: string;
                     updated_at: string;
                 };
                 Insert: {
                     id?: string;
                     name?: string;
+                    key?: string;
                     created_at?: string;
                     updated_at?: string;
                 };
                 Update: {
                     id?: string;
                     name?: string;
-                    created_at?: string;
+                    key?: string;
                     updated_at?: string;
                 };
                 Relationships: [];

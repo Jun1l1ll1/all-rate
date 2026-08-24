@@ -2,11 +2,11 @@
     import { longpress, uncheckAllEditCheckboxes, toggleEditItem } from '$lib/scripts/common';
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
+    import { page } from '$app/state';
     
     import DiscreteErrorMessage from '$lib/components/DiscreteErrorMessage.svelte';
     import ConfirmPopup from '$lib/components/ConfirmPopup.svelte';
     import NewButton from '$lib/components/NewButton.svelte';
-    import { page } from '$app/state';
 
     let { data, form } = $props();
 
@@ -56,6 +56,81 @@
             if (ele instanceof HTMLInputElement) iids.push(ele.value);
         });
         return iids;
+    }
+    
+    type AnimeResult = {
+        externalId: string;
+        title: string;
+        imageUrl: string | null;
+        url: string | null;
+    };
+
+    let title = $state('');
+    let externalId = $state('');
+    let results = $state<AnimeResult[]>([]);
+    let isSearching = $state(false);
+    let searchError = $state('');
+    let showResults = $state(false);
+    let searchTimer: ReturnType<typeof setTimeout> | undefined;
+    let requestId = 0;
+
+    async function searchPresetItem() {
+        const query = title.trim();
+        if (query.length < 2 || externalId) {
+            results = [];
+            showResults = false;
+            return;
+        }
+
+        const currentRequest = ++requestId;
+        isSearching = true;
+        searchError = '';
+        showResults = true;
+
+        try {
+            const response = await fetch(`/api/anime/search?q=${encodeURIComponent(query)}`);
+            const payload = await response.json();
+            if (currentRequest !== requestId) return;
+            if (!response.ok) throw new Error(payload.error || 'Anime search failed.');
+            results = payload.results;
+        } catch (error) {
+            if (currentRequest !== requestId) return;
+            results = [];
+            searchError = error instanceof Error ? error.message : 'Anime search failed.';
+        } finally {
+            if (currentRequest === requestId) isSearching = false;
+        }
+    }
+
+    function handleTitleInput() {
+        externalId = '';
+        searchError = '';
+        showResults = true;
+        if (searchTimer) clearTimeout(searchTimer);
+        searchTimer = setTimeout(searchPresetItem, 300);
+    }
+
+    function selectPresetItem(anime: AnimeResult) {
+        title = anime.title;
+        externalId = anime.externalId;
+        results = [];
+        showResults = false;
+        searchError = '';
+    }
+
+    function clearPresetItemSelection() {
+        externalId = '';
+        showResults = false;
+        results = [];
+    }
+
+    function handleTitleKeydown(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+            showResults = false;
+        } else if (event.key === 'ArrowDown' && results.length > 0) {
+            event.preventDefault();
+            (document.querySelector('.preset-result') as HTMLButtonElement | null)?.focus();
+        }
     }
 
 </script>
@@ -178,8 +253,79 @@
 </form>
 
 {#if data.is_owner}
-    <NewButton type="item" collectionId={data.collection.id} pathname={page.url.pathname + page.url.search} />
+    <NewButton
+        type="item"
+        collectionId={data.collection.id}
+        pathname={page.url.pathname + page.url.search}
+        usePopup={data.collection.pid !== null}>
+
+        <input type="hidden" id="ci-iid" name="ci-iid" value="" />
+        <h3>Create item <span id="ci-item-name"></span></h3>
+
+        <label class="preset-search">
+            Title
+            <div class="preset-input-row">
+                <input id="ci-title-inp"
+                    name="title"
+                    type="text"
+                    maxlength="200"
+                    bind:value={title}
+                    oninput={handleTitleInput}
+                    onkeydown={handleTitleKeydown}
+                    onfocus={() => (showResults = title.trim().length >= 2 && !externalId)}
+                    onfocusout={() => showResults = false}
+                    autocomplete="off"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={showResults}
+                    aria-controls="preset-results"
+                />
+                {#if externalId}
+                    <button type="button" class="clear-preset" onclick={clearPresetItemSelection} aria-label="Clear preset item selection">Clear</button>
+                {/if}
+            </div>
+
+            {#if showResults}
+                <div id="preset-results" class="preset-results" role="listbox">
+                    {#if isSearching}
+                        <div class="preset-status">Searching...</div>
+                    {:else if searchError}
+                        <div class="preset-status">{searchError}</div>
+                    {:else if results.length === 0 && title.trim().length >= 2}
+                        <div class="preset-status">No anime found. You can continue with free text.</div>
+                    {:else}
+                        {#each results as pitem (pitem.externalId)}
+                            <button class="preset-result"
+                                type="button"
+                                role="option"
+                                aria-selected="false"
+                                onclick={() => selectPresetItem(pitem)}>
+
+                                <span>{pitem.title}</span>
+                                <small>MAL #{pitem.externalId}</small>
+                            </button>
+                        {/each}
+                    {/if}
+                </div>
+            {/if}
+            <input type="hidden" id="ci-external-id" name="external_id" value={externalId} />
+        </label>
+
+        <button type="button" onclick={() => {
+            // TODO? Ensure an external id exists
+            goto(resolve(`/update/item?cid=${data.collection.id}&exid=${(document.getElementById('ci-external-id') as HTMLInputElement).value}`))
+        }}>Select</button>
+        <button type="button" onclick={() => goto(resolve(`/update/item?cid=${data.collection.id}`))}>Create custom</button>
+
+        <div class="bottom-row">
+            <button type="button" onclick={() => {
+                (document.getElementById('new-button-popup') as HTMLDialogElement).close();
+                title = ''; // Reset title
+            }}>Cancel</button>
+        </div>
+    </NewButton>
 {/if}
+
 {#if form?.error}
     <DiscreteErrorMessage errorMessage={form.error} />
 {/if}
@@ -231,5 +377,66 @@
         .list-comment {
             font-size: 0.8rem;
         }
+    }
+
+
+    .preset-search {
+        position: relative;
+    }
+
+    .preset-input-row {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    .preset-input-row input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .clear-preset {
+        background: var(--g-container-color);
+        cursor: pointer;
+        padding-inline: 0.7rem;
+    }
+
+    .preset-results {
+        position: absolute;
+        z-index: 2;
+        left: 0;
+        right: 0;
+        overflow: hidden;
+        margin-top: 0.3rem;
+        border-radius: var(--g-border-radius);
+        background: var(--g-container-color);
+        box-shadow: 0 8px 20px #00000066;
+    }
+
+    .preset-result {
+        display: flex;
+        width: 100%;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.6rem 0.7rem;
+        background: transparent;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .preset-result:hover,
+    .preset-result:focus-visible {
+        background: var(--g-primary-color);
+        outline: none;
+    }
+
+    .preset-result small {
+        flex: none;
+        color: #b8c1c5;
+    }
+
+    .preset-status {
+        padding: 0.7rem;
+        color: #b8c1c5;
     }
 </style>

@@ -10,6 +10,8 @@
     <form class="create-form" method="POST">
         <input type="hidden" name="cid" value={data.cid} />
         <input type="hidden" name="iid" value={data.item?.id || ''} />
+        <input type="hidden" name="preset_key" value={data.preset?.key || ''} />
+        <input type="hidden" name="preset_exid" value={data.preset?.externalId || ''} />
 
         <label>
             Title
@@ -25,6 +27,10 @@
             Comment
             <textarea name="comment" maxlength="5000">{data.item?.comment || ''}</textarea>
         </label>
+
+        {#if data.preset}
+            <p>This item is from a preset</p>
+        {/if}
 
         <button type="submit" class="update-btn">{#if !data.item}Create{:else}Update{/if} item</button>
     </form>

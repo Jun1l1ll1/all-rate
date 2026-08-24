@@ -23,7 +23,7 @@
         </label>
 
         <label>
-            Preset (not functional)
+            Preset
             <select name="preset">
                 <option value="">- None -</option>
                 {#each data.presets as preset (preset.id)}
